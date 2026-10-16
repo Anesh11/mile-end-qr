@@ -10,8 +10,8 @@ import { OutputPass } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/
 // Route order and district-local landmark positions are shared by every representation.
 export const STOPS = [
   { id: 'metro', number: 'M', name: 'DÉPART · MÉTRO LAURIER', position: [7, -6], pinHeight: 1.5 },
-  { id: 'fairmount', number: '1', name: 'FAIRMOUNT BAGEL', position: [-1, -4.9], pinHeight: 1.5, description: 'la célèbre boulangerie de bagels' },
-  { id: 'drogheria', number: '2', name: 'DROGHERIA FINE', position: [-2.5, -4.9], pinHeight: 1.5, description: "l'épicerie italienne du quartier" },
+  { id: 'drogheria', number: '1', name: 'DROGHERIA FINE', position: [-2.5, -4.9], pinHeight: 1.5, description: "l'épicerie italienne du quartier" },
+  { id: 'fairmount', number: '2', name: 'FAIRMOUNT BAGEL', position: [-1, -4.9], pinHeight: 1.5, description: 'la célèbre boulangerie de bagels' },
   { id: 'olimpico', number: '3', name: 'CAFÉ OLIMPICO', position: [-5, 1], pinHeight: 1.7, description: 'le café célèbre depuis 1970' },
   { id: 'church', number: '4', name: 'ÉGLISE SAINT-MICHEL-ARCHANGE', position: [-7.1, 1.4], pinHeight: 3.6, description: 'la belle église du quartier' },
   { id: 'rialto', number: '5', name: 'THÉÂTRE RIALTO', position: [4.8, 5.3], pinHeight: 2.4, description: 'le vieux cinéma des années 1920,', extra: "point d'arrivée" }
@@ -26,7 +26,7 @@ export function mountMap3D(container, { interactive = true, width = container.cl
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1;
   renderer.domElement.setAttribute('role', 'img');
-  renderer.domElement.setAttribute('aria-label', 'Circuit schématique du Mile End : station Laurier, Fairmount Bagel, Drogheria Fine, Café Olimpico, église Saint-Michel-Archange et Théâtre Rialto.');
+  renderer.domElement.setAttribute('aria-label', 'Circuit schématique du Mile End : station Laurier, Drogheria Fine, Fairmount Bagel, Café Olimpico, église Saint-Michel-Archange et Théâtre Rialto.');
   container.append(renderer.domElement);
   const scene = new THREE.Scene();
   const aspect = width / height, span = aspect < 1 ? 19 / aspect : 20;
@@ -200,8 +200,12 @@ export function mountMap3D(container, { interactive = true, width = container.cl
       // Try nearby card edges; all candidates keep the leader within 12% of the frame.
       const candidates = [];
       for (const distance of [gap, gap*2, gap*3]) {
-        for (const [dx,dy] of [[0,-h/2-distance],[0,h/2+distance],[-w/2-distance,0],[w/2+distance,0]]) {
-          for (const nudge of [0,-h,h]) {
+        // Keep Olimpico below and right of its pin, away from the church dome.
+        const offsets = stop.id === 'olimpico'
+          ? [[w/2+distance,h/2+distance]]
+          : [[0,-h/2-distance],[0,h/2+distance],[-w/2-distance,0],[w/2+distance,0]];
+        for (const [dx,dy] of offsets) {
+          for (const nudge of (stop.id === 'olimpico' ? [0,h] : [0,-h,h])) {
             const cx = THREE.MathUtils.clamp(px+dx+(dx===0 ? nudge : 0),w/2+8,width-w/2-8);
             const cy = THREE.MathUtils.clamp(py+dy+(dx!==0 ? nudge : 0),h/2+8,height-h/2-8);
             const edgeX = THREE.MathUtils.clamp(px,cx-w/2,cx+w/2);

@@ -35,14 +35,14 @@ try {
   const stops = STOPS.filter(stop => stop.id !== 'metro');
   ctx.strokeStyle = '#e2761d'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(205, 850); ctx.lineTo(205, 2810); ctx.stroke();
   stops.forEach(({name, number, description, extra}, i) => {
-    const displayName = i === 3 ? 'ÉGLISE SAINT-MICHEL-' : name;
+    const displayName = number === '4' ? 'ÉGLISE SAINT-MICHEL-' : name;
     const y = 850 + i * 490;
     ctx.fillStyle = '#e2761d'; ctx.beginPath(); ctx.arc(205, y, 22, 0, Math.PI*2); ctx.fill();
     ctx.font = '150px "Bebas Neue", Impact, sans-serif'; ctx.fillText(number, 280, y+45);
     ctx.fillStyle = '#1b2a4a'; ctx.font = '74px "Bebas Neue", Impact, sans-serif'; ctx.fillText(displayName, 410, y+12);
-    if(i===3) ctx.fillText('ARCHANGE', 410, y+95);
+    if(number === '4') ctx.fillText('ARCHANGE', 410, y+95);
     ctx.font = '38px system-ui, sans-serif'; ctx.fillText(description, 280, y+180);
-    if(i===4) ctx.fillText(extra, 280, y+240);
+    if(number === '5') ctx.fillText(extra, 280, y+240);
   });
   ctx.fillStyle = '#1b2a4a'; ctx.font = '62px "Bebas Neue", Impact, sans-serif'; ctx.textAlign = 'center';
   ctx.fillText('Manushi · Preshita · Fariba · Arina', 2480, 3400);
