@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Notre circuit touristique — rendu haute résolution</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap">
-<style>body{margin:0;background:#fdf3e3}#map{display:none}#output{display:block;width:100%;height:auto}</style>
+<style>body{margin:0;background:#fafaf8}#map{display:none}#output{display:block;width:100%;height:auto}</style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
 </head>
 <body><div id="map"></div><canvas id="output" width="4961" height="3508" aria-label="Notre circuit touristique du Mile End"></canvas>
@@ -15,13 +15,29 @@ window.__done = false;
 try {
   await document.fonts.load('100px "Bebas Neue"');
   await document.fonts.ready;
-  const map = mountMap3D(document.querySelector('#map'), { interactive: false, width: 4961, height: 3508, pixelRatio: 1, preserveDrawingBuffer: true });
+  const params = new URLSearchParams(location.search);
+  const mapOnly = params.get('mode') === 'map';
+  const dimension = (key, fallback) => {
+    const value = Number(params.get(key));
+    return Number.isSafeInteger(value) && value > 0 ? value : fallback;
+  };
+  const width = mapOnly ? dimension('w', 4961) : 4961;
+  const height = mapOnly ? dimension('h', 3508) : 3508;
+  const canvas = document.querySelector('#output'), ctx = canvas.getContext('2d');
+  canvas.width = width; canvas.height = height;
+  if (mapOnly) {
+    document.body.style.background = 'transparent';
+    canvas.style.width = `${width}px`; canvas.style.height = `${height}px`;
+  }
+  const map = mountMap3D(document.querySelector('#map'), { interactive: false, width, height, mapOnly, pixelRatio: 1, preserveDrawingBuffer: true });
   map.render();
   if (map.renderer.domElement.projectedStops.length !== STOPS.length) throw new Error('Incomplete stop labels');
   console.table(map.renderer.domElement.projectedStops);
   window.__projectedStops = map.renderer.domElement.projectedStops;
-  const canvas = document.querySelector('#output'), ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#fdf3e3'; ctx.fillRect(0, 0, 4961, 3508);
+  if (mapOnly) {
+    ctx.drawImage(map.renderer.domElement, 0, 0);
+  } else {
+  ctx.fillStyle = '#fafaf8'; ctx.fillRect(0, 0, 4961, 3508);
   // The scene itself is rendered at full export resolution before compositing.
   ctx.drawImage(map.renderer.domElement, 1280, 600, 3681, 2603);
   ctx.font = '220px "Bebas Neue", Impact, sans-serif'; ctx.textAlign = 'left';
@@ -46,6 +62,7 @@ try {
   });
   ctx.fillStyle = '#1b2a4a'; ctx.font = '62px "Bebas Neue", Impact, sans-serif'; ctx.textAlign = 'center';
   ctx.fillText('Manushi · Preshita · Fariba · Arina', 2480, 3400);
+  }
   window.__png = canvas.toDataURL('image/png');
   window.__done = true;
   map.dispose();
