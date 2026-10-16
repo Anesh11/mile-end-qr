@@ -1,4 +1,5 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
+import { mergeGeometries } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/utils/BufferGeometryUtils.js';
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js';
 
 import { EffectComposer } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/postprocessing/EffectComposer.js';
@@ -173,7 +174,7 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     ctx.textBaseline = 'alphabetic';
     return {sprite, ratio:canvas.width/canvas.height, textFraction:ctx.measureText('H').actualBoundingBoxAscent/canvas.height};
   }
-  const pinParts = [];
+  const pinParts = [], pickTargets = [];
   STOPS.forEach(stop => {
     const firstPin = district.children.length;
     const [x, z] = stop.position, h = stop.pinHeight;
@@ -198,12 +199,88 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     if (mapOnly) district.children.slice(firstPin).forEach(object => {
       pinParts.push({object, origin: new THREE.Vector3(x,h,z), offset: object.position.clone().sub(new THREE.Vector3(x,h,z)), scale: object.scale.clone()});
     });
+    if (interactive && stop.id !== 'metro') district.children.slice(firstPin).forEach(object => { object.userData.stopNumber=Number(stop.number); pickTargets.push(object); });
     // Numbers appear once on the map, on their own pins.
     const {sprite,ratio,textFraction} = card(stop.name, stop.id === 'metro' ? null : stop.number);
+    if (interactive && stop.id !== 'metro') { sprite.userData.stopNumber=Number(stop.number); pickTargets.push(sprite); }
     const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:'#e2761d',depthTest:false,transparent:true,opacity:.8}));
     line.renderOrder=109; scene.add(line);
     callouts.push({stop,sprite,ratio,textFraction,line,anchor:new THREE.Vector3(x,h,z)});
   });
+  // One merged, vertex-coloured mesh per student, including articulated leg vertices.
+  const students = [];
+  const journey = [];
+  let distance = 0, seconds = 0;
+  STOPS.slice(1).forEach((stop,i) => {
+    const from = STOPS[i].position, to = stop.position;
+    const length = Math.abs(to[0]-from[0])+Math.abs(to[1]-from[1]);
+    journey.push({start:seconds,end:seconds+length/1.35,from:distance,to:distance+length,stop});
+    seconds += length/1.35;
+    journey.push({start:seconds,end:seconds+1.5,from:distance+length,to:distance+length,stop});
+    seconds += 1.5; distance += length;
+  });
+  if (interactive) ['#d35570','#5b98ca','#e8b646','#75a588'].forEach((shirt,index) => {
+    const parts=[], legs=[];
+    let count=0;
+    function part(geometry,color,x,y,z,leg=0) {
+      geometry=geometry.toNonIndexed(); geometry.translate(x,y,z);
+      const colors=new Float32Array(geometry.attributes.position.count*3), c=new THREE.Color(color);
+      for(let i=0;i<colors.length;i+=3){colors[i]=c.r;colors[i+1]=c.g;colors[i+2]=c.b;}
+      geometry.setAttribute('color',new THREE.BufferAttribute(colors,3));
+      if(leg) legs.push({start:count,end:count+geometry.attributes.position.count,sign:leg});
+      count+=geometry.attributes.position.count;parts.push(geometry);
+    }
+    part(new THREE.CapsuleGeometry(.13,.26,3,6),shirt,0,.57,0);
+    part(new THREE.SphereGeometry(.125,8,6),'#dca681',0,.91,0);
+    part(new THREE.SphereGeometry(.139,8,6,0,Math.PI*2,0,Math.PI*.6),['#352a26','#49352b','#22232b','#68422c'][index],0,.94,-.015);
+    part(new THREE.BoxGeometry(.22,.27,.12),'#353d58',0,.59,-.16);
+    [-1,1].forEach(sign=>{
+      part(new THREE.CapsuleGeometry(.045,.24,2,5),'#dca681',sign*.18,.55,0);
+      part(new THREE.BoxGeometry(.085,.32,.09),'#333a52',sign*.07,.23,0,sign);
+      part(new THREE.BoxGeometry(.10,.06,.17),'#faf5e8',sign*.07,.05,.035,sign);
+    });
+    const geometry=mergeGeometries(parts);parts.forEach(g=>g.dispose());
+    const figure=mesh(geometry,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.9}),0,0,0);
+    figure.renderOrder=104; figure.material.depthTest=false;
+    students.push({figure,legs,base:geometry.attributes.position.array.slice(),index});
+  });
+  let walkTime=0, lastWalkFrame=null, pausedStop=null;
+  function animateStudents(time) {
+    if(!interactive) return;
+    if(lastWalkFrame!==null) walkTime+=Math.max(0,Math.min((time-lastWalkFrame)/1000,.1));
+    lastWalkFrame=time;
+    const elapsed=walkTime%seconds;
+    const leg=journey.find(leg=>elapsed>=leg.start && elapsed<leg.end) || journey[0];
+    pausedStop=leg.from===leg.to ? leg.stop.number : null;
+    const fraction=(elapsed-leg.start)/(leg.end-leg.start);
+    const progress=(leg.from+(leg.to-leg.from)*fraction)/distance;
+    students.forEach(({figure,legs,base,index})=>{
+      const t=Math.max(0,progress-index*.008), point=curve.getPoint(t), tangent=curve.getTangent(t);
+      figure.position.copy(point);figure.position.y+=.10+(pausedStop?0:Math.sin(walkTime*9+index)*.035);
+      figure.rotation.y=Math.atan2(tangent.x,tangent.z);
+      const position=figure.geometry.attributes.position;
+      legs.forEach(({start,end,sign})=>{
+        const angle=pausedStop?0:Math.sin(walkTime*9+index)*.32*sign;
+        for(let i=start;i<end;i++){
+          const y=base[i*3+1]-.39,z=base[i*3+2];
+          position.setXYZ(i,base[i*3],.39+y*Math.cos(angle)-z*Math.sin(angle),y*Math.sin(angle)+z*Math.cos(angle));
+        }
+      });position.needsUpdate=true;
+    });
+  }
+  const raycaster=new THREE.Raycaster(), pointer=new THREE.Vector2();
+  let tapStart=null;
+  function beginTap(event){tapStart={x:event.clientX,y:event.clientY};}
+  function endTap(event){
+    if(!tapStart || Math.hypot(event.clientX-tapStart.x,event.clientY-tapStart.y)>8)return;
+    tapStart=null;
+    const rect=renderer.domElement.getBoundingClientRect();
+    pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);
+    raycaster.setFromCamera(pointer,camera);
+    const hit=raycaster.intersectObjects(pickTargets,false)[0];
+    if(hit) window.dispatchEvent(new CustomEvent('map:stop',{detail:{n:hit.object.userData.stopNumber}}));
+  }
+  if(interactive){renderer.domElement.addEventListener('pointerdown',beginTap);renderer.domElement.addEventListener('pointerup',endTap);}
   const foliage=mat('#d6d3ce'), trunk=mat('#c9c6c0');
   for(let i=0;i<24;i++){const x=-9+(i%12)*1.65,z=i<12 ? -3.3 : 4.8;if(crosses.some(v=>Math.abs(x-v)<.6))continue;mesh(new THREE.CylinderGeometry(.06,.09,.5,6),trunk,x,.25,z);mesh(new THREE.IcosahedronGeometry(.34,1),foliage,x,.65,z);}
   // Transparent radial footprints give buildings soft contact shadows.
@@ -226,6 +303,7 @@ export function mountMap3D(container, { interactive = true, width = container.cl
   function passWheel(event) { event.stopImmediatePropagation(); }
   let disposed = false;
   function draw(time = 0, fitIteration = 0) {
+    if (typeof time !== 'number') time = lastWalkFrame ?? 0;
     if (mapOnly) {
       const units = (camera.top-camera.bottom)/camera.zoom;
       const scale = units/20 * 2;
@@ -240,6 +318,7 @@ export function mountMap3D(container, { interactive = true, width = container.cl
       arrows.forEach(arrow => arrow.scale.setScalar(units/20));
     }
     if (disposed) return;
+    animateStudents(time);
     arrows.forEach((arrow, i) => {
       const t = (i / arrows.length + (interactive ? time * .000025 : .025)) % 1;
       arrow.position.copy(curve.getPoint(t)); arrow.position.y += .73;
@@ -303,7 +382,11 @@ export function mountMap3D(container, { interactive = true, width = container.cl
       const {cx,cy,edgeX,edgeY,length} = best;
       occupied.push({left:cx-w/2,right:cx+w/2,top:cy-h/2,bottom:cy+h/2});
       sprite.position.set(cx/width*2-1,1-cy/height*2,projected.z).unproject(camera);
-      sprite.scale.set(w/width*viewWidth,h/height*viewHeight,1);
+      const pulse = interactive && stop.number === pausedStop ? 1.06 + .04*Math.sin(walkTime*8) : 1;
+      sprite.scale.set(w/width*viewWidth*pulse,h/height*viewHeight*pulse,1);
+      sprite.material.color.set(stop.number === pausedStop ? '#ffe0a0' : '#ffffff');
+      sprite.layers.set(0);
+      if (interactive && stop.number === pausedStop) sprite.layers.enable(1);
       const edge = new THREE.Vector3(edgeX/width*2-1,1-edgeY/height*2,projected.z).unproject(camera);
       line.geometry.setFromPoints([worldAnchor,edge]);
       projectedStops.push({number:stop.number,name:stop.name,pin:[px,py],label:[cx,cy],leaderFraction:length/Math.min(width,height)});
@@ -338,6 +421,8 @@ export function mountMap3D(container, { interactive = true, width = container.cl
   render();
   return { renderer, render, dispose() {
     disposed = true;
+    renderer.domElement.removeEventListener('pointerdown',beginTap);
+    renderer.domElement.removeEventListener('pointerup',endTap);
     controls?.domElement.removeEventListener('wheel', passWheel, true);
     controls?.dispose();
     const geometries = new Set(), materials = new Set(), textures = new Set();
