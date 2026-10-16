@@ -1,0 +1,13 @@
+# v4 fixes after phone test (edit index.html only; keep everything else)
+1. Stops 1-3 (video stops: Drogheria Bjj8aSSxzCA, Fairmount -t05RQbvjTo, Olimpico TLtj_e0pcSk) new layout:
+   - Video area = top ~65svh of the snap, NOTHING overlaid on it (no gradient, no text, no badges, no credit). Video centered 9:16 within that area, blurred photo backdrop on the sides is ok. Progress bar stays at very top above the video area (it's ok if it sits on the top 6px only).
+   - Below: compact glass panel (backdrop-filter blur, rgba white/dark) with number badge, name, address, (Drogheria: price line), text clamped to 2 lines, "Voir sur la carte" button, "Lire plus" button. Photo credit small inside panel.
+   - "Lire plus" opens a bottom sheet (slides up, transform only, drag handle, close button, backdrop click closes, Escape closes, focus trapped/restored) showing full text, credits and the 3D food scene larger with its ✨ and "Activer l'inclinaison" controls.
+   - 3D food: NOT over the video. Small round badge (56px) inside the glass panel at its right; tapping it opens the bottom sheet with the full 3D scene. Keep lazy/pause logic.
+2. Video clips (food segments, loop just that segment): embed src https://www.youtube-nocookie.com/embed/<ID>?autoplay=1&mute=1&playsinline=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=<ID>&start=S&end=E
+   - Drogheria Bjj8aSSxzCA: start=4&end=16
+   - Fairmount -t05RQbvjTo: start=4&end=16
+   - Olimpico TLtj_e0pcSk: start=34&end=46
+   Note: YouTube loop with playlist restarts from 0 not start; so also use the IFrame API-free trick: on iframe load, listen to postMessage? Simpler robust approach: reload the iframe src every (E-S) seconds while visible (timer cleared when hidden). Implement that.
+3. Snap transitions: scroll-driven depth transition. For each snap section, compute progress p in [-1,1] of its offset relative to the viewport (rAF-throttled scroll listener on the scroller; IntersectionObserver to limit to the 3 nearest sections). Inner wrapper transform: leaving card (p<0, scrolling up past it): rotateX(p*-18deg) translateZ(p*180px) scale(1+p*0.12), opacity 1+p*0.7; entering card (p>0): translateZ(-p*260px) scale(1-p*0.15) rotateX(p*10deg), opacity 1-p*0.6. Scroller has perspective:1200px; transform-origin center top for leaving, center bottom for entering. Only transform/opacity; will-change on the 3 active wrappers only. prefers-reduced-motion: no transforms, simple opacity fade.
+4. Keep stops 4-5 then/now, ending card, route section, credits as they are, but ensure their overlay text doesn't cover the key part of the image either (fine to leave).
