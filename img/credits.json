@@ -68,5 +68,73 @@
   "license": "CC BY 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:Avenue_Bernard.jpg",
   "note": "photo d'illustration du Mile End"
+ },
+ "eglise-1922": {
+  "file": "File:Interior St Michael's Church, Montreal (HS85-10-39629).jpg",
+  "author": "Alfred Hunter Ward",
+  "license": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File:Interior_St_Michael%27s_Church,_Montreal_(HS85-10-39629).jpg",
+  "date": "1922date Q"
+ },
+ "eglise-2007": {
+  "file": "File:Eglise St Michael.JPG",
+  "author": "Mourial",
+  "license": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Eglise_St_Michael.JPG",
+  "date": "2007-06-20"
+ },
+ "eglise-2025": {
+  "file": "File:Church of St. Michael and St. Anthony exterior, November 2025.jpg",
+  "author": "Jason Zhang",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Church_of_St._Michael_and_St._Anthony_exterior,_November_2025.jpg",
+  "date": "2025-11-10"
+ },
+ "rialto-2011": {
+  "file": "File:Cinéma Rialto 2011.jpg",
+  "author": "Philippe Du Berger",
+  "license": "CC BY 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Cin%C3%A9ma_Rialto_2011.jpg",
+  "date": "2011-12-14"
+ },
+ "rialto-2017": {
+  "file": "File:Théâtre Rialto (2017) photo 01.jpg",
+  "author": "Pierre5018",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Th%C3%A9%C3%A2tre_Rialto_(2017)_photo_01.jpg",
+  "date": "2017-04-12"
+ },
+ "wilensky": {
+  "file": "File:Wilensky's - 1.jpg",
+  "author": "Anna Frodesiak",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Wilensky%27s_-_1.jpg",
+  "date": "2011-06-29"
+ },
+ "casa": {
+  "file": "File:Victoria Vox dehors Casa Del Popolo.jpg",
+  "author": "Bull-Doser",
+  "license": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File:Victoria_Vox_dehors_Casa_Del_Popolo.jpg"
+ },
+ "champ": {
+  "file": "File:Champ des possibles - 01.JPG",
+  "author": "Jeangagnon",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Champ_des_possibles_-_01.JPG",
+  "date": "2013-06-02"
+ },
+ "pickup": {
+  "file": "File:Montréal Mile end 434 (8338544214).jpg",
+  "author": "Alain Rouiller",
+  "license": "CC BY-SA 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Montr%C3%A9al_Mile_end_434_(8338544214).jpg",
+  "note": "photo d'illustration du Mile End"
+ },
+ "hero-mural": {
+  "file": "File:Graffiti in Mile End 02.jpg",
+  "author": "Bohemian Baltimore",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Graffiti_in_Mile_End_02.jpg"
  }
 }
