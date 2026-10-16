@@ -367,16 +367,47 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     };
     const routeSamples = Array.from({length:250}, (_,i) => projectLocal(curve.getPoint(i/249).add(new THREE.Vector3(0,.37,0))));
     const landmarks = STOPS.flatMap(stop => [0,.5,1,1.5,2].map(y => projectLocal(new THREE.Vector3(...[stop.position[0],y,stop.position[1]]))));
-    callouts.forEach(({stop,sprite,ratio,textFraction,line,anchor}) => {
+    // Project after the portrait rotation/fit (and on every controls/animation draw).
+    // All interactive offsets and collision bounds below are in CSS pixels.
+    const screenPins = callouts.map(({anchor}) => projectLocal(anchor));
+    const firstPin = screenPins[1], secondPin = screenPins[2];
+    const firstOnLeft = firstPin.x <= secondPin.x;
+    callouts.forEach(({stop,sprite,ratio,textFraction,line,anchor}, index) => {
       const worldAnchor = district.localToWorld(anchor.clone());
       const projected = worldAnchor.clone().project(camera);
       const px = (projected.x+1)*width/2, py = (1-projected.y)*height/2;
-      const h = interactive ? Math.min(height*.026/textFraction,(width-24)/ratio) : height*.03/textFraction;
-      const w = h*ratio;
+      let h = interactive ? Math.min(height*.026/textFraction,(width-24)/ratio) : height*.03/textFraction;
+      let w = h*ratio;
       const gap = Math.min(width,height)*.025;
       // Try nearby card edges; all candidates keep the leader within 12% of the frame.
       const candidates = [];
-      for (const distance of [gap, gap*2, gap*3, gap*5, gap*7, gap*9]) {
+      if (interactive) {
+        const margin = 8, leaderGap = 12;
+        const forcedSide = stop.number === '1' ? (firstOnLeft ? -1 : 1)
+          : stop.number === '2' ? (firstOnLeft ? 1 : -1) : null;
+        const available = side => side === 1 ? width-margin-px-leaderGap : px-margin-leaderGap;
+        const sides = forcedSide ? [forcedSide] : [1, -1];
+        // Keep the entire card beside its pin, shrinking only when neither side fits.
+        const room = Math.max(0, ...sides.map(available));
+        if (w > room) { w = room; h = w/ratio; }
+        const visible = px >= margin && px <= width-margin && py >= margin && py <= height-margin && room > 0;
+        sprite.visible = line.visible = visible;
+        for (const side of sides) {
+          if (available(side) < w) continue;
+          for (const dy of [0, -12, 12, -24, 24]) {
+            const cx = px + side*(leaderGap+w/2);
+            const cy = THREE.MathUtils.clamp(py+dy,h/2+margin,height-h/2-margin);
+            const edgeX = px+side*leaderGap;
+            const edgeY = THREE.MathUtils.clamp(py,cy-h/2,cy+h/2);
+            const length = Math.hypot(edgeX-px,edgeY-py);
+            if (length > 40) continue;
+            const overlap = occupied.reduce((sum,r) => sum + Math.max(0,Math.min(cx+w/2,r.right)-Math.max(cx-w/2,r.left)+4)*Math.max(0,Math.min(cy+h/2,r.bottom)-Math.max(cy-h/2,r.top)+4),0);
+            const pinOverlap = screenPins.reduce((sum,pin,i) => sum + (i !== index && Math.abs(cx-pin.x)<w/2+8 && Math.abs(cy-pin.y)<h/2+8 ? 1 : 0),0);
+            candidates.push({cx,cy,edgeX,edgeY,length,score:overlap*10000+pinOverlap*width*height+Math.abs(cy-py)*2+(side === 1 ? 0 : 1)});
+          }
+        }
+      }
+      if (!interactive) for (const distance of [gap, gap*2, gap*3, gap*5, gap*7, gap*9]) {
         // Keep Olimpico below and right of its pin, away from the church dome.
         const offsets = stop.id === 'olimpico'
           ? [[w/2+distance,h/2+distance]]
@@ -415,7 +446,8 @@ export function mountMap3D(container, { interactive = true, width = container.cl
       const {cx,cy,edgeX,edgeY,length} = best;
       occupied.push({left:cx-w/2,right:cx+w/2,top:cy-h/2,bottom:cy+h/2});
       sprite.position.set(cx/width*2-1,1-cy/height*2,projected.z).unproject(camera);
-      const pulse = interactive && stop.number === pausedStop ? 1.06 + .04*Math.sin(walkTime*8) : 1;
+      // Keep interactive card edges fixed to their short leaders, including during pauses.
+      const pulse = 1;
       sprite.scale.set(w/width*viewWidth*pulse,h/height*viewHeight*pulse,1);
       sprite.material.color.set(stop.number === pausedStop ? '#ffe0a0' : '#ffffff');
       sprite.layers.set(0);
