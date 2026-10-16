@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
 <style>
-.route-media{margin-bottom:18px;border-radius:22px;overflow:hidden;background:#fdf3e3}.route-media img,.route-media video{display:block;width:100%;height:clamp(300px,48svh,460px);object-fit:contain}.route-media [hidden]{display:none}.route-map3d{width:100%;height:clamp(300px,48svh,460px);background:#fdf3e3;border-radius:22px;overflow:hidden;margin-bottom:18px}.route-map3d[hidden]{display:none}.route-map3d canvas{display:block;width:100%;height:100%}
+.route-media{margin-bottom:18px;border-radius:22px;overflow:hidden;background:#fdf3e3}.route-media img,.route-media video{display:block;width:100%;height:clamp(300px,48svh,460px);object-fit:contain}.route-media [hidden]{display:none}
 
 :root{--red:#c8102e;--ink:#1b1a1f;--cream:#fbf7f2}*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden}body{background:var(--ink);color:var(--cream);font:16px/1.5 system-ui,sans-serif}a{color:inherit;text-underline-offset:3px}button,input{font:inherit}button{cursor:pointer}a:focus-visible,button:focus-visible,input:focus-visible,main:focus-visible{outline:3px solid #ffcc75;outline-offset:3px}main{height:100vh;height:100svh;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;overscroll-behavior:contain;perspective:1200px;position:relative}.snap{height:100vh;height:100svh;scroll-snap-align:start;scroll-snap-stop:always;position:relative}.scene{height:100%;position:relative;transform-style:preserve-3d}.media{position:absolute;inset:0;overflow:hidden;background:var(--ink)}.poster,.before,.hero-photo{display:block;width:100%;height:100%;object-fit:cover}.media>.poster{transform:translateY(var(--pan,0px)) scale(var(--zoom,1.06))}.video-stop .media>.poster{filter:blur(10px);opacity:.6}.video-poster{position:absolute;left:50%;top:0;transform:translateX(-50%);height:100%;width:auto;max-width:100%;aspect-ratio:9/16;object-fit:cover}.video-slot{position:absolute;inset:0;display:flex;justify-content:center}.video-slot iframe{height:100%;width:auto;aspect-ratio:9/16;border:0;opacity:0;transition:opacity .4s}.video-slot iframe.loaded{opacity:1}.overlay{position:absolute;bottom:0;left:0;right:0;max-height:80%;overflow-y:auto;padding:70px 24px max(24px,env(safe-area-inset-bottom));background:#1b1a1fb8;transform:translateZ(20px)}.photo-credit{font-size:10px;line-height:1.4;margin-bottom:10px;color:#eee}.badge{display:grid;place-items:center;width:32px;height:32px;background:var(--red);border-radius:50%;font-size:14px;font-weight:800;margin-bottom:8px}h1,h2,h3,p{margin:0}h1{font-size:clamp(38px,10vw,64px);line-height:1.04;letter-spacing:-.05em}h2{font-size:clamp(28px,7vw,42px);line-height:1.08;letter-spacing:-.035em}.address{font-size:14px;opacity:.75;margin:8px 0 12px}.texte{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.texte.expanded{display:block}.read-more{border:0;background:none;color:#fff;text-decoration:underline;padding:6px 0;min-height:48px;font-size:14px}.button{display:flex;align-items:center;justify-content:center;min-height:48px;background:var(--red);border-radius:14px;color:white;text-decoration:none;text-align:center;padding:12px 16px;font-weight:750;line-height:1.3}.button:hover{background:#a80c27}.hero{overflow:hidden}.hero-photo{position:absolute;inset:0;transform:translateY(var(--pan,0px)) scale(1.1)}.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(#1b1a1f55,#1b1a1ff5)}.hero-body{position:relative;z-index:1;display:flex;flex-direction:column;justify-content:center;gap:24px;padding:40px 26px;height:100%;transform:translateZ(30px)}.eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase}.team{border:1px solid #fff5;background:#ffffff12;border-radius:30px;padding:9px 14px;font-size:12px;width:fit-content}.hint{position:absolute;right:8px;top:36%;writing-mode:vertical-rl;z-index:2;font-size:11px;letter-spacing:.06em}.progress{position:fixed;z-index:10;top:0;left:50%;transform:translateX(-50%);width:min(100%,640px);padding:12px 20px;background:linear-gradient(#1b1a1fbb,transparent);pointer-events:none}.progress[hidden]{display:none}.segments{display:flex;gap:5px}.segment{height:3px;background:#fff5;flex:1;border-radius:4px;overflow:hidden}.segment i{display:block;height:100%;background:white;transform:scaleX(0);transform-origin:left}.progress-label{font-size:11px;margin-top:6px;text-shadow:0 1px 4px #000}.before{position:absolute;inset:0;clip-path:inset(0 0 0 var(--wipe,0%));filter:grayscale(1) sepia(.35)}.history-stop .poster{filter:grayscale(var(--gray,1)) sepia(var(--sepia,.35))}.era{position:absolute;top:70px;left:24px;background:#1b1a1faa;border-radius:30px;padding:7px 12px;font-size:12px}.compare-controls{display:flex;align-items:center;gap:12px}.compare-controls input{width:100%;min-height:48px;accent-color:var(--red)}.replay,.play{min-height:48px;border:1px solid #fff8;border-radius:30px;background:#1b1a1fbb;color:white;padding:8px 16px;white-space:nowrap}.play{position:absolute;left:50%;top:25%;transform:translateX(-50%);z-index:2}.play[hidden]{display:none}.optional{display:inline-flex;align-items:center;min-height:48px;font-size:12px}.paper{background:var(--cream);color:var(--ink);padding:24px 20px;overflow-y:auto}.paper h2{font-size:clamp(25px,6vw,34px);margin-bottom:18px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mini{background:white;border-radius:22px;padding:10px;box-shadow:0 8px 24px #1b1a1f12;transition:transform .3s}.mini figure{margin:0}.mini img{width:100%;height:clamp(70px,15svh,150px);object-fit:cover;border-radius:14px;display:block}.mini figcaption{font-size:9px;line-height:1.3;color:#59555c;margin:7px 0}.mini h3{font-size:16px;line-height:1.15;margin:8px 0}.mini .button{font-size:11px;padding:8px 5px}.route-list{font-size:14px;padding-left:22px;margin:0 0 18px}.route-list li{padding:3px}.route-list li::marker{color:var(--red);font-weight:bold}.map{width:100%;height:300px;border:0;border-radius:22px;margin-top:18px}footer{font-size:12px;margin-top:20px;padding-top:18px;border-top:1px solid #1b1a1f22}footer p{margin-bottom:12px}.all-credits{font-size:10px;padding-left:18px}.all-credits li{margin:6px 0}@media(min-width:700px){main{max-width:640px;margin:auto;box-shadow:0 0 100px #000}.scene{border-radius:22px}}@media(hover:hover) and (prefers-reduced-motion:no-preference){.mini:hover{transform:perspective(700px) rotateX(3deg) rotateY(-4deg) translateY(-3px)}}@media(max-width:359px){.grid{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;scroll-behavior:auto!important}.scene,.hero-body{transform:none!important}.poster,.hero-photo{transform:none!important}.before{clip-path:none!important;opacity:var(--old-opacity,1)}.history-stop .poster{filter:none!important}}
 
@@ -24,7 +24,7 @@
 @media(max-aspect-ratio:9/16){.video-slot iframe,.video-poster{width:100%;height:auto;min-height:100%;aspect-ratio:9/16;position:absolute;top:50%;transform:translateY(-50%)}.video-poster{left:0}}
 
 /* Full viewport route media. */
-.route{background:#fdf3e3}.route .scene{overflow:hidden;border-radius:0}.route .route-media,.route #map-panel,.route .route-map3d{position:absolute;inset:0;width:100%;height:100%;margin:0;border-radius:0}.route .route-media{background:#fdf3e3}.route .route-media img,.route .route-media video{width:100%;height:100%;object-fit:cover}.route .route-media [hidden]{display:none}.extras{padding:0;overflow:hidden}.extras-content{padding:24px 20px;overflow-y:auto;overscroll-behavior-y:contain}.stop-pill{right:auto;max-width:calc(100% - 24px);width:max-content}.stop-pill button{min-width:0;font-size:13px;padding:6px 4px;white-space:normal}.stop-pill{padding-left:16px}.stop-pill a{white-space:nowrap}.overlay .food-badge,.overlay .food-badge canvas{width:56px;height:56px;margin:0}.stop-sheet .food-badge{max-width:100%}.stop-sheet .food-badge canvas{max-width:100%}
+.route{background:#fdf3e3}.route .scene{overflow:hidden;border-radius:0}.route .route-media,.route #map-panel{position:absolute;inset:0;width:100%;height:100%;margin:0;border-radius:0}.route .route-media{background:#fdf3e3}.route .route-media img,.route .route-media video{width:100%;height:100%;object-fit:cover}.route .route-media [hidden]{display:none}.extras{padding:0;overflow:hidden}.extras-content{padding:24px 20px;overflow-y:auto;overscroll-behavior-y:contain}.stop-pill{right:auto;max-width:calc(100% - 24px);width:max-content}.stop-pill button{min-width:0;font-size:13px;padding:6px 4px;white-space:normal}.stop-pill{padding-left:16px}.stop-pill a{white-space:nowrap}.overlay .food-badge,.overlay .food-badge canvas{width:56px;height:56px;margin:0}.stop-sheet .food-badge{max-width:100%}.stop-sheet .food-badge canvas{max-width:100%}
 
 .hero-photo{animation:hero-zoom 20s ease-in-out infinite alternate;transform:scale(1)}
 @keyframes hero-zoom{to{transform:scale(1.12)}}
@@ -38,10 +38,121 @@
 #route-toggle{position:absolute;top:calc(16px + env(safe-area-inset-top));right:16px;z-index:5;border:1px solid #fff6;border-radius:30px;padding:9px 16px;background:#1b1a1fcc;color:white}#route-toggle[hidden]{display:none}
 .video-slot iframe{pointer-events:auto}.video-stop .reveal-panel{inset:auto;top:70px;right:12px;width:48px;height:48px}
 @media(prefers-reduced-motion:reduce){.hero-photo,.timeline-photo.current{animation:none!important;transform:none!important}.timeline-photo{transition:none!important}}
-.video-stop[data-aspect="16:9"] .video-slot{overflow:hidden}.video-stop[data-aspect="16:9"] .video-slot iframe{position:absolute;top:0;left:50%;height:100svh;width:calc(100svh * 16 / 9);min-height:0;max-width:none;aspect-ratio:16/9;transform:translateX(-50%)}
-</style></head><body><div class="progress" hidden aria-hidden="true"><div class="segments"><span class="segment"><i></i></span><span class="segment"><i></i></span><span class="segment"><i></i></span><span class="segment"><i></i></span><span class="segment"><i></i></span></div><div class="progress-label"></div></div><main id="circuit" tabindex="0" aria-label="Circuit touristique du Mile End"><section class="snap hero" id="intro" aria-labelledby="title"><img class="hero-photo" src="img/hero-mural.jpg" alt="Une murale du Mile End" width="1080" height="1920"><div class="hero-body"><span class="eyebrow">Montréal · À pied · 5 arrêts</span><span class="team">Manushi · Preshita · Fariba · Arina</span><h1 id="title">Le Mile End — Notre circuit touristique en 5 arrêts</h1><p>Départ : station de métro Laurier (ligne orange)</p><a class="button" href="#arret-1">Commencer le circuit ↓</a><p class="photo-credit"><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Graffiti_in_Mile_End_02.jpg">Photo : Bohemian Baltimore, CC BY-SA 4.0</a></p></div><span class="hint">Glissez vers le haut ↑</span></section><section class="snap stop video-stop" id="arret-1" aria-labelledby="stop-1" data-aspect="16:9" data-video="ORc096uEZWw" data-start="10" data-end="20"><article class="scene"><div class="media"><img class="poster" src="img/drogheria-equipe.jpg" alt="Drogheria Fine photographiée par notre équipe" width="1000" height="835" loading="lazy"><img class="video-poster" src="img/drogheria-equipe.jpg" alt="Drogheria Fine photographiée par notre équipe" width="1000" height="835" loading="lazy"><div class="video-slot"></div><button class="play" hidden aria-label="Lire la vidéo de Drogheria Fine">▶ Lire la vidéo</button></div><div class="overlay"><div class="photo-credit">Photo : l&#x27;équipe (Manushi, Preshita, Fariba, Arina)</div><span class="badge" aria-label="Arrêt 1">01</span><h2 id="stop-1">Drogheria Fine</h2><p class="address">68 Av. Fairmount O.</p><p class="price">5 $, ou 6 $ avec fromage <small>(source : Montreal Gazette)</small></p><p class="texte" id="texte-1">Drogheria Fine est une petite épicerie italienne du quartier. Elle est connue pour ses gnocchis à 5 $, servis dans une boîte avec la sauce tomate de la nonna. Il y a souvent une file d&#x27;attente !</p><button class="read-more" aria-expanded="false" aria-controls="texte-1">Lire plus</button><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Drogheria+Fine+68+Av+Fairmount+O+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></div></article></section><section class="snap stop video-stop" id="arret-2" aria-labelledby="stop-2" data-aspect="16:9" data-video="CBfgVuP6udQ" data-start="23" data-end="37"><article class="scene"><div class="media"><img class="poster" src="img/fairmount.jpg" alt="La devanture de Fairmount Bagel" width="1000" height="776"><img class="video-poster" src="img/fairmount.jpg" alt="La devanture de Fairmount Bagel" width="1000" height="776"><div class="video-slot"></div><button class="play" hidden aria-label="Lire la vidéo de Fairmount Bagel">▶ Lire la vidéo</button></div><div class="overlay"><div class="photo-credit"><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Iconic_Storefront_Fairmount_Bagel.png">Photo : Jamie, CC BY 2.0</a></div><span class="badge" aria-label="Arrêt 2">02</span><h2 id="stop-2">Fairmount Bagel</h2><p class="address">74 Av. Fairmount O.</p><p class="texte" id="texte-2">Fairmount Bagel est la célèbre boulangerie de bagels du Mile End, ouverte depuis 1919. Les bagels sont roulés à la main et cuits au four à bois. Elle est ouverte 24 heures sur 24 !</p><button class="read-more" aria-expanded="false" aria-controls="texte-2">Lire plus</button><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Fairmount+Bagel+74+Av+Fairmount+O+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></div></article></section><section class="snap stop video-stop" id="arret-3" aria-labelledby="stop-3" data-aspect="16:9" data-video="FstBuQ5v8X4" data-start="58" data-end="70"><article class="scene"><div class="media"><img class="poster" src="img/olimpico.jpg" alt="Le Café Olimpico dans le Mile End" width="1000" height="556" loading="lazy"><img class="video-poster" src="img/olimpico.jpg" alt="Le Café Olimpico dans le Mile End" width="1000" height="556" loading="lazy"><div class="video-slot"></div><button class="play" hidden aria-label="Lire la vidéo de Café Olimpico">▶ Lire la vidéo</button></div><div class="overlay"><div class="photo-credit"><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:20160904_-_01_-_Montreal_(Mile_End).jpg">Photo : Andre Carrotflower, CC BY-SA 4.0</a></div><span class="badge" aria-label="Arrêt 3">03</span><h2 id="stop-3">Café Olimpico</h2><p class="address">124 Rue Saint-Viateur O.</p><p class="texte" id="texte-3">Café Olimpico est le café célèbre du Mile End depuis 1970, fondé par Rocco Furfaro. On y boit un vrai espresso italien. C&#x27;est un lieu de rencontre pour tout le quartier.</p><button class="read-more" aria-expanded="false" aria-controls="texte-3">Lire plus</button><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Cafe+Olimpico+124+Rue+Saint-Viateur+O+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></div></article></section><section class="snap stop history-stop" id="arret-4" aria-labelledby="stop-4" data-year="1916"><article class="scene"><div class="media timeline"><img class="timeline-photo archive" src="img/eglise-1916.jpg" alt="1916 construction" data-label="1916" loading="lazy"><img class="timeline-photo archive" src="img/eglise-1922.jpg" alt="1922 intérieur" data-label="1922" loading="lazy"><img class="timeline-photo" src="img/eglise-2007.jpg" alt="2007 " data-label="2007" loading="lazy"><img class="timeline-photo" src="img/eglise.jpg" alt="2013 " data-label="2013" loading="lazy"><img class="timeline-photo" src="img/eglise-2025.jpg" alt="Aujourd’hui " data-label="Aujourd’hui" loading="lazy"><span class="era" aria-live="polite"></span></div><div class="overlay"><div class="photo-credit">1916 · construction : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Eglise_St._Michael_en_construction_1916.jpg">Photo : Construction Journal, janvier 1916, Domaine public</a><br>1922 · intérieur : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Interior_St_Michael%27s_Church,_Montreal_(HS85-10-39629).jpg">Photo : Alfred Hunter Ward, Public domain</a><br>2007 : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Eglise_St_Michael.JPG">Photo : Mourial, CC BY 3.0</a><br>2013 : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Church_of_St._Michael_and_St._Anthony.jpg">Photo : Jeangagnon, CC BY-SA 3.0</a><br>Aujourd’hui : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Church_of_St._Michael_and_St._Anthony_exterior,_November_2025.jpg">Photo : Jason Zhang, CC BY-SA 4.0</a></div><div class="timeline-controls"><button class="replay">Rejouer ↻</button><div class="timeline-dots" role="group" aria-label="Choisir une photo"><button aria-label="1916 construction" aria-pressed="false"></button><button aria-label="1922 intérieur" aria-pressed="false"></button><button aria-label="2007 " aria-pressed="false"></button><button aria-label="2013 " aria-pressed="false"></button><button aria-label="Aujourd’hui " aria-pressed="false"></button></div></div><a class="optional" href="https://www.youtube.com/watch?v=99Wu6XS7Xqg" target="_blank" rel="noopener">▶ Voir la vidéo (optionnel)</a><span class="badge" aria-label="Arrêt 4">04</span><h2 id="stop-4">Église Saint-Michel-Archange</h2><p class="address">5580 Rue Saint-Urbain</p><p class="texte" id="texte-4">Cette église a été conçue par l&#x27;architecte Aristide Beaugrand-Champagne en 1915. Elle a un dôme unique de style byzantin, inspiré de Sainte-Sophie à Istanbul. Son dôme était le plus grand de Montréal avant l&#x27;Oratoire Saint-Joseph.</p><button class="read-more" aria-expanded="false" aria-controls="texte-4">Lire plus</button><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Eglise+Saint-Michel-Archange+5580+Rue+Saint-Urbain+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></div></article></section><section class="snap stop history-stop" id="arret-5" aria-labelledby="stop-5" data-year="1936"><article class="scene"><div class="media timeline"><img class="timeline-photo archive" src="img/rialto-1936.jpg" alt="1936 " data-label="1936" loading="lazy"><img class="timeline-photo" src="img/rialto-2011.jpg" alt="2011 détail de la façade" data-label="2011" loading="lazy"><img class="timeline-photo" src="img/rialto.jpg" alt="2011 façade" data-label="2011" loading="lazy"><img class="timeline-photo" src="img/rialto-2017.jpg" alt="Aujourd’hui " data-label="Aujourd’hui" loading="lazy"><span class="era" aria-live="polite"></span></div><div class="overlay"><div class="photo-credit">1936 : <a target="_blank" rel="noopener" href="https://archivesdemontreal.com/nous-joindre/">Photo : Archives de la Ville de Montréal. CA M001 VM094-Y-1-17-D0118 (1er avril 1936), CC BY-NC-SA 4.0</a><br>2011 · détail de la façade : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Cin%C3%A9ma_Rialto_2011.jpg">Photo : Philippe Du Berger, CC BY 2.0</a><br>2011 · façade : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Rialto_Theatre_Montreal_01.jpg">Photo : Jeangagnon, CC BY-SA 3.0</a><br>Aujourd’hui : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Th%C3%A9%C3%A2tre_Rialto_(2017)_photo_01.jpg">Photo : Pierre5018, CC BY-SA 4.0</a></div><div class="timeline-controls"><button class="replay">Rejouer ↻</button><div class="timeline-dots" role="group" aria-label="Choisir une photo"><button aria-label="1936 " aria-pressed="false"></button><button aria-label="2011 détail de la façade" aria-pressed="false"></button><button aria-label="2011 façade" aria-pressed="false"></button><button aria-label="Aujourd’hui " aria-pressed="false"></button></div></div><a class="optional" href="https://www.youtube.com/shorts/X8c-hD6RqiA" target="_blank" rel="noopener">▶ Voir la vidéo (optionnel)</a><span class="badge" aria-label="Arrêt 5">05</span><h2 id="stop-5">Théâtre Rialto</h2><p class="address">5723 Av. du Parc</p><p class="texte" id="texte-5">Le Théâtre Rialto est un ancien cinéma construit en 1924. C&#x27;est une salle historique, très belle, qui accueille aujourd&#x27;hui des spectacles et des événements.</p><button class="read-more" aria-expanded="false" aria-controls="texte-5">Lire plus</button><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Theatre+Rialto+5723+Av+du+Parc+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></div></article></section><section class="snap paper extras" id="decouvrir" aria-labelledby="more"><div class="scene extras-content"><h2 id="more">Il y a encore plus à découvrir dans le Mile End !</h2><div class="grid"><article class="mini"><figure><img src="img/stviateur.jpg" alt="La devanture de St-Viateur Bagel" width="960" height="720" loading="lazy"><figcaption><a href="https://commons.wikimedia.org/wiki/File:St-Viateur_Bagel_-_158_Saint-Viateur_Ouest_-_01.jpg" target="_blank" rel="noopener">Photo : Jeangagnon, CC BY-SA 3.0</a></figcaption></figure><h3>St-Viateur Bagel</h3><p class="mini-description">L’autre grande boulangerie de bagels, ouverte depuis 1957.</p><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=St-Viateur+Bagel+263+Rue+Saint-Viateur+O+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></article><article class="mini"><figure><img src="img/alfred.jpg" alt="Une vue du Mile End pour illustrer Café Alfred" width="960" height="720" loading="lazy"><figcaption><a href="https://commons.wikimedia.org/wiki/File:20181013_-_01_-_Montreal_(Mile_End).jpg" target="_blank" rel="noopener">Photo : Andre Carrotflower, CC BY-SA 4.0</a> — photo d&#x27;illustration du Mile End</figcaption></figure><h3>Café Alfred</h3><p class="mini-description">Un café chaleureux du quartier.</p><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Cafe+Alfred+Mile+End+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></article><article class="mini"><figure><img src="img/mimicoco.jpg" alt="L’avenue Bernard pour illustrer Mimi &amp; Coco" width="960" height="1280" loading="lazy"><figcaption><a href="https://commons.wikimedia.org/wiki/File:Avenue_Bernard.jpg" target="_blank" rel="noopener">Photo : GuyofMshire, CC BY 4.0</a> — photo d&#x27;illustration du Mile End</figcaption></figure><h3>Mimi &amp; Coco</h3><p class="mini-description">Une boutique de vêtements et cadeaux du Mile End.</p><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Mimi+%26+Coco+Mile+End+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></article><article class="mini"><figure><img src="img/murales.jpg" alt="Une murale dans le Mile End" width="960" height="1280" loading="lazy"><figcaption><a href="https://commons.wikimedia.org/wiki/File:20181013_-_05_-_Montreal_(Mile_End).jpg" target="_blank" rel="noopener">Photo : Andre Carrotflower, CC BY-SA 4.0</a></figcaption></figure><h3>Les murales du Mile End</h3><p class="mini-description">Des fresques géantes à découvrir au détour des ruelles.</p><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Murales+Mile+End+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></article><article class="mini"><figure><img src="img/wilensky.jpg" alt="Wilensky’s Light Lunch" loading="lazy"><figcaption><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Wilensky%27s_-_1.jpg">Photo : Anna Frodesiak, CC BY-SA 3.0</a></figcaption></figure><h3>Wilensky’s Light Lunch</h3><p class="address">34 Av. Fairmount O.</p><p class="mini-description">Le comptoir à sandwichs mythique depuis 1932, célèbre pour son « Wilensky Special ».</p><a class="button" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=Wilensky%27s+Light+Lunch+34+Av+Fairmount+O+Montreal">Voir sur la carte ↗</a></article><article class="mini"><figure><img src="img/pickup.jpg" alt="Dépanneur Le Pick Up — photo d’illustration du Mile End" loading="lazy"><figcaption><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Montr%C3%A9al_Mile_end_434_(8338544214).jpg">Photo : Alain Rouiller, CC BY-SA 2.0</a> — photo d’illustration du Mile End</figcaption></figure><h3>Dépanneur Le Pick Up</h3><p class="address">7032 Rue Waverly (Mile-Ex)</p><p class="mini-description">Un dépanneur rétro avec comptoir à sandwichs et terrasse, adoré du quartier.</p><a class="button" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=Depanneur+Le+Pick+Up+7032+Rue+Waverly+Montreal">Voir sur la carte ↗</a></article><article class="mini"><figure><img src="img/casa.jpg" alt="Casa del Popolo" loading="lazy"><figcaption><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Victoria_Vox_dehors_Casa_Del_Popolo.jpg">Photo : Bull-Doser, Public domain</a></figcaption></figure><h3>Casa del Popolo</h3><p class="address">4873 Boul. Saint-Laurent</p><p class="mini-description">Bar, resto végé et salle de concerts indépendants depuis 2000.</p><a class="button" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=Casa+del+Popolo+4873+Boul+Saint-Laurent+Montreal">Voir sur la carte ↗</a></article><article class="mini"><figure><img src="img/champ.jpg" alt="Champ des Possibles" loading="lazy"><figcaption><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Champ_des_possibles_-_01.JPG">Photo : Jeangagnon, CC BY-SA 3.0</a></figcaption></figure><h3>Champ des Possibles</h3><p class="address">Rue Saint-Viateur E. / Rue De Gaspé</p><p class="mini-description">Un espace vert sauvage, cogéré par les citoyens, au bord de la voie ferrée.</p><a class="button" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=Champ+des+Possibles+Montreal">Voir sur la carte ↗</a></article></div><footer><p>Réalisé par Manushi, Preshita, Fariba et Arina</p><p>Crédits photos : Wikimedia Commons et Archives de la Ville de Montréal, sous les licences indiquées auprès de chaque photo. Photo de Drogheria Fine : l’équipe.</p><ul class="all-credits"><li>fairmount — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Iconic_Storefront_Fairmount_Bagel.png">Photo : Jamie, CC BY 2.0</a></li><li>drogheria — Photo : l&#x27;équipe (Manushi, Preshita, Fariba, Arina)</li><li>olimpico — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:20160904_-_01_-_Montreal_(Mile_End).jpg">Photo : Andre Carrotflower, CC BY-SA 4.0</a></li><li>eglise — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Church_of_St._Michael_and_St._Anthony.jpg">Photo : Jeangagnon, CC BY-SA 3.0</a></li><li>rialto — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Rialto_Theatre_Montreal_01.jpg">Photo : Jeangagnon, CC BY-SA 3.0</a></li><li>eglise-1916 — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Eglise_St._Michael_en_construction_1916.jpg">Photo : Construction Journal, janvier 1916, Domaine public</a></li><li>rialto-1936 — <a target="_blank" rel="noopener" href="https://archivesdemontreal.com/nous-joindre/">Photo : Archives de la Ville de Montréal. CA M001 VM094-Y-1-17-D0118 (1er avril 1936), CC BY-NC-SA 4.0</a></li><li>stviateur — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:St-Viateur_Bagel_-_158_Saint-Viateur_Ouest_-_01.jpg">Photo : Jeangagnon, CC BY-SA 3.0</a></li><li>murales — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:20181013_-_05_-_Montreal_(Mile_End).jpg">Photo : Andre Carrotflower, CC BY-SA 4.0</a></li><li>alfred — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:20181013_-_01_-_Montreal_(Mile_End).jpg">Photo : Andre Carrotflower, CC BY-SA 4.0</a> — photo d&#x27;illustration du Mile End</li><li>mimicoco — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Avenue_Bernard.jpg">Photo : GuyofMshire, CC BY 4.0</a> — photo d&#x27;illustration du Mile End</li><li>hero-mural — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Graffiti_in_Mile_End_02.jpg">Photo : Bohemian Baltimore, CC BY-SA 4.0</a></li><li>eglise-1922 — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Interior_St_Michael%27s_Church,_Montreal_(HS85-10-39629).jpg">Photo : Alfred Hunter Ward, Public domain</a></li><li>eglise-2007 — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Eglise_St_Michael.JPG">Photo : Mourial, CC BY 3.0</a></li><li>eglise-2025 — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Church_of_St._Michael_and_St._Anthony_exterior,_November_2025.jpg">Photo : Jason Zhang, CC BY-SA 4.0</a></li><li>rialto-2011 — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Cin%C3%A9ma_Rialto_2011.jpg">Photo : Philippe Du Berger, CC BY 2.0</a></li><li>rialto-2017 — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Th%C3%A9%C3%A2tre_Rialto_(2017)_photo_01.jpg">Photo : Pierre5018, CC BY-SA 4.0</a></li><li>wilensky — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Wilensky%27s_-_1.jpg">Photo : Anna Frodesiak, CC BY-SA 3.0</a></li><li>pickup — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Montr%C3%A9al_Mile_end_434_(8338544214).jpg">Photo : Alain Rouiller, CC BY-SA 2.0</a></li><li>casa — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Victoria_Vox_dehors_Casa_Del_Popolo.jpg">Photo : Bull-Doser, Public domain</a></li><li>champ — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Champ_des_possibles_-_01.JPG">Photo : Jeangagnon, CC BY-SA 3.0</a></li><li><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Lofi_music_001.wav">Musique : « Lofi music 001 » par Luisalvaz, CC0 (Wikimedia Commons)</a></li></ul><a href="#intro">Revenir au début ↑</a></footer></div></section><section class="snap route" id="itineraire" aria-label="Itinéraire à pied"><div class="scene"><div class="route-media"><div id="map-panel"><img id="map-poster" src="map-3d.png" alt="Carte du circuit du Mile End en cinq arrêts"><div id="route-map3d" class="route-map3d" hidden></div></div><button id="route-toggle" hidden aria-pressed="false">▶ Clip</button><video id="route-video" hidden muted loop playsinline preload="metadata" src="img/route-walk.mp4" poster="map-3d.png"></video></div></div></section></main><audio id="bgm" src="audio/lofi-mile-end.mp3" loop preload="none"></audio><button id="music-toggle" aria-label="Couper la musique" aria-pressed="false">🔊</button><script>
+
+
+/* Players fit their native aspect ratio; swipe surfaces preserve page scrolling. */
+.video-slot{align-items:center}
+.video-slot iframe,.video-poster{width:auto;height:auto;max-width:100%;max-height:100svh;aspect-ratio:9/16}
+.video-slot iframe{height:min(100svh,177.7778vw);pointer-events:none}
+.video-poster{top:50%;transform:translate(-50%,-50%);height:min(100svh,177.7778vw);object-fit:contain}
+.video-stop[data-aspect="16:9"] .video-slot iframe,.video-stop[data-aspect="16:9"] .video-poster{width:100%;height:auto;aspect-ratio:16/9;max-height:100svh;object-fit:contain}
+.video-swipe{position:absolute;inset:0;z-index:1;touch-action:pan-y}
+.video-interact .video-slot iframe{pointer-events:auto}
+.video-interact .video-swipe{pointer-events:none}
+.video-edge{position:absolute;left:0;right:0;height:18%;z-index:1;touch-action:pan-y}
+.video-edge.top{top:0}.video-edge.bottom{bottom:0}
+.video-mode{position:absolute;top:19%;left:12px;z-index:2;border:1px solid #fff6;border-radius:20px;background:#1b1a1faa;color:white;padding:6px 10px;font-size:11px}
+.route .route-media video{object-fit:contain;pointer-events:none;background:#fdf3e3}
+</style></head><body><div class="progress" hidden aria-hidden="true"><div class="segments"><span class="segment"><i></i></span><span class="segment"><i></i></span><span class="segment"><i></i></span><span class="segment"><i></i></span><span class="segment"><i></i></span></div><div class="progress-label"></div></div><main id="circuit" tabindex="0" aria-label="Circuit touristique du Mile End"><section class="snap hero" id="intro" aria-labelledby="title"><img class="hero-photo" src="img/hero-mural.jpg" alt="Une murale du Mile End" width="1080" height="1920"><div class="hero-body"><span class="eyebrow">Montréal · À pied · 5 arrêts</span><span class="team">Manushi · Preshita · Fariba · Arina</span><h1 id="title">Le Mile End — Notre circuit touristique en 5 arrêts</h1><p>Départ : station de métro Laurier (ligne orange)</p><a class="button" href="#arret-1">Commencer le circuit ↓</a><p class="photo-credit"><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Graffiti_in_Mile_End_02.jpg">Photo : Bohemian Baltimore, CC BY-SA 4.0</a></p></div><span class="hint">Glissez vers le haut ↑</span></section><section class="snap stop video-stop" id="arret-1" aria-labelledby="stop-1" data-provider="tiktok" data-aspect="9:16" data-src="https://www.tiktok.com/player/v1/7694392059808992533?autoplay=1&amp;muted=1&amp;loop=1&amp;controls=1&amp;description=0&amp;music_info=0"><article class="scene"><div class="media"><img class="poster" src="img/drogheria-equipe.jpg" alt="Drogheria Fine photographiée par notre équipe" width="1000" height="835" loading="lazy"><img class="video-poster" src="img/drogheria-equipe.jpg" alt="Drogheria Fine photographiée par notre équipe" width="1000" height="835" loading="lazy"><div class="video-slot"></div><button class="play" hidden aria-label="Lire la vidéo de Drogheria Fine">▶ Lire la vidéo</button></div><div class="overlay"><div class="photo-credit"><a target="_blank" rel="noopener" href="https://www.tiktok.com/@ashers.appetite/video/7694392059808992533">Vidéo : @ashers.appetite (TikTok)</a><br>Photo : l&#x27;équipe (Manushi, Preshita, Fariba, Arina)</div><span class="badge" aria-label="Arrêt 1">01</span><h2 id="stop-1">Drogheria Fine</h2><p class="address">68 Av. Fairmount O.</p><p class="price">5 $, ou 6 $ avec fromage <small>(source : Montreal Gazette)</small></p><p class="texte" id="texte-1">Drogheria Fine est une petite épicerie italienne du quartier. Elle est connue pour ses gnocchis à 5 $, servis dans une boîte avec la sauce tomate de la nonna. Il y a souvent une file d&#x27;attente !</p><button class="read-more" aria-expanded="false" aria-controls="texte-1">Lire plus</button><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Drogheria+Fine+68+Av+Fairmount+O+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></div></article></section><section class="snap stop video-stop" id="arret-2" aria-labelledby="stop-2" data-provider="instagram" data-aspect="9:16" data-src="https://www.instagram.com/reel/Dczfn6Wp-fk/embed/"><article class="scene"><div class="media"><img class="poster" src="img/fairmount.jpg" alt="La devanture de Fairmount Bagel" width="1000" height="776"><img class="video-poster" src="img/fairmount.jpg" alt="La devanture de Fairmount Bagel" width="1000" height="776"><div class="video-slot"></div><button class="play" hidden aria-label="Lire la vidéo de Fairmount Bagel">▶ Lire la vidéo</button></div><div class="overlay"><div class="photo-credit"><a target="_blank" rel="noopener" href="https://www.instagram.com/reel/Dczfn6Wp-fk/">Vidéo : @derryx (Instagram)</a><br><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Iconic_Storefront_Fairmount_Bagel.png">Photo : Jamie, CC BY 2.0</a></div><span class="badge" aria-label="Arrêt 2">02</span><h2 id="stop-2">Fairmount Bagel</h2><p class="address">74 Av. Fairmount O.</p><p class="texte" id="texte-2">Fairmount Bagel est la célèbre boulangerie de bagels du Mile End, ouverte depuis 1919. Les bagels sont roulés à la main et cuits au four à bois. Elle est ouverte 24 heures sur 24 !</p><button class="read-more" aria-expanded="false" aria-controls="texte-2">Lire plus</button><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Fairmount+Bagel+74+Av+Fairmount+O+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></div></article></section><section class="snap stop video-stop" id="arret-3" aria-labelledby="stop-3" data-provider="youtube" data-aspect="16:9" data-src="https://www.youtube.com/embed/FstBuQ5v8X4?autoplay=1&amp;mute=1&amp;playsinline=1&amp;controls=1&amp;rel=0&amp;start=56"><article class="scene"><div class="media"><img class="poster" src="img/olimpico.jpg" alt="Le Café Olimpico dans le Mile End" width="1000" height="556" loading="lazy"><img class="video-poster" src="img/olimpico.jpg" alt="Le Café Olimpico dans le Mile End" width="1000" height="556" loading="lazy"><div class="video-slot"></div><button class="play" hidden aria-label="Lire la vidéo de Café Olimpico">▶ Lire la vidéo</button></div><div class="overlay"><div class="photo-credit"><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:20160904_-_01_-_Montreal_(Mile_End).jpg">Photo : Andre Carrotflower, CC BY-SA 4.0</a></div><span class="badge" aria-label="Arrêt 3">03</span><h2 id="stop-3">Café Olimpico</h2><p class="address">124 Rue Saint-Viateur O.</p><p class="texte" id="texte-3">Café Olimpico est le café célèbre du Mile End depuis 1970, fondé par Rocco Furfaro. On y boit un vrai espresso italien. C&#x27;est un lieu de rencontre pour tout le quartier.</p><button class="read-more" aria-expanded="false" aria-controls="texte-3">Lire plus</button><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Cafe+Olimpico+124+Rue+Saint-Viateur+O+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></div></article></section><section class="snap stop history-stop" id="arret-4" aria-labelledby="stop-4" data-timeline="eglise" data-year="1916"><article class="scene"><div class="media timeline"><span class="era" aria-live="polite"></span></div><div class="overlay"><div class="photo-credit">1916 · construction : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Eglise_St._Michael_en_construction_1916.jpg">Photo : Construction Journal, janvier 1916, Domaine public</a><br>1922 · intérieur : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Interior_St_Michael%27s_Church,_Montreal_(HS85-10-39629).jpg">Photo : Alfred Hunter Ward, Public domain</a><br>2007 : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Eglise_St_Michael.JPG">Photo : Mourial, CC BY 3.0</a><br>2013 : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Church_of_St._Michael_and_St._Anthony.jpg">Photo : Jeangagnon, CC BY-SA 3.0</a><br>Aujourd’hui : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Church_of_St._Michael_and_St._Anthony_exterior,_November_2025.jpg">Photo : Jason Zhang, CC BY-SA 4.0</a></div><div class="timeline-controls"><button class="replay">Rejouer ↻</button><div class="timeline-dots" role="group" aria-label="Choisir une photo"></div></div><a class="optional" href="https://www.youtube.com/watch?v=99Wu6XS7Xqg" target="_blank" rel="noopener">▶ Voir la vidéo (optionnel)</a><span class="badge" aria-label="Arrêt 4">04</span><h2 id="stop-4">Église Saint-Michel-Archange</h2><p class="address">5580 Rue Saint-Urbain</p><p class="texte" id="texte-4">Cette église a été conçue par l&#x27;architecte Aristide Beaugrand-Champagne en 1915. Elle a un dôme unique de style byzantin, inspiré de Sainte-Sophie à Istanbul. Son dôme était le plus grand de Montréal avant l&#x27;Oratoire Saint-Joseph.</p><button class="read-more" aria-expanded="false" aria-controls="texte-4">Lire plus</button><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Eglise+Saint-Michel-Archange+5580+Rue+Saint-Urbain+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></div></article></section><section class="snap stop history-stop" id="arret-5" aria-labelledby="stop-5" data-timeline="rialto" data-year="1936"><article class="scene"><div class="media timeline"><span class="era" aria-live="polite"></span></div><div class="overlay"><div class="photo-credit">1936 : <a target="_blank" rel="noopener" href="https://archivesdemontreal.com/nous-joindre/">Photo : Archives de la Ville de Montréal. CA M001 VM094-Y-1-17-D0118 (1er avril 1936), CC BY-NC-SA 4.0</a><br>2011 · détail de la façade : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Cin%C3%A9ma_Rialto_2011.jpg">Photo : Philippe Du Berger, CC BY 2.0</a><br>2011 · façade : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Rialto_Theatre_Montreal_01.jpg">Photo : Jeangagnon, CC BY-SA 3.0</a><br>Aujourd’hui : <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Th%C3%A9%C3%A2tre_Rialto_(2017)_photo_01.jpg">Photo : Pierre5018, CC BY-SA 4.0</a></div><div class="timeline-controls"><button class="replay">Rejouer ↻</button><div class="timeline-dots" role="group" aria-label="Choisir une photo"></div></div><a class="optional" href="https://www.youtube.com/shorts/X8c-hD6RqiA" target="_blank" rel="noopener">▶ Voir la vidéo (optionnel)</a><span class="badge" aria-label="Arrêt 5">05</span><h2 id="stop-5">Théâtre Rialto</h2><p class="address">5723 Av. du Parc</p><p class="texte" id="texte-5">Le Théâtre Rialto est un ancien cinéma construit en 1924. C&#x27;est une salle historique, très belle, qui accueille aujourd&#x27;hui des spectacles et des événements.</p><button class="read-more" aria-expanded="false" aria-controls="texte-5">Lire plus</button><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Theatre+Rialto+5723+Av+du+Parc+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></div></article></section><section class="snap paper extras" id="decouvrir" aria-labelledby="more"><div class="scene extras-content"><h2 id="more">Il y a encore plus à découvrir dans le Mile End !</h2><div class="grid"><article class="mini"><figure><img src="img/stviateur.jpg" alt="La devanture de St-Viateur Bagel" width="960" height="720" loading="lazy"><figcaption><a href="https://commons.wikimedia.org/wiki/File:St-Viateur_Bagel_-_158_Saint-Viateur_Ouest_-_01.jpg" target="_blank" rel="noopener">Photo : Jeangagnon, CC BY-SA 3.0</a></figcaption></figure><h3>St-Viateur Bagel</h3><p class="mini-description">L’autre grande boulangerie de bagels, ouverte depuis 1957.</p><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=St-Viateur+Bagel+263+Rue+Saint-Viateur+O+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></article><article class="mini"><figure><img src="img/alfred.jpg" alt="Une vue du Mile End pour illustrer Café Alfred" width="960" height="720" loading="lazy"><figcaption><a href="https://commons.wikimedia.org/wiki/File:20181013_-_01_-_Montreal_(Mile_End).jpg" target="_blank" rel="noopener">Photo : Andre Carrotflower, CC BY-SA 4.0</a> — photo d&#x27;illustration du Mile End</figcaption></figure><h3>Café Alfred</h3><p class="mini-description">Un café chaleureux du quartier.</p><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Cafe+Alfred+Mile+End+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></article><article class="mini"><figure><img src="img/mimicoco.jpg" alt="L’avenue Bernard pour illustrer Mimi &amp; Coco" width="960" height="1280" loading="lazy"><figcaption><a href="https://commons.wikimedia.org/wiki/File:Avenue_Bernard.jpg" target="_blank" rel="noopener">Photo : GuyofMshire, CC BY 4.0</a> — photo d&#x27;illustration du Mile End</figcaption></figure><h3>Mimi &amp; Coco</h3><p class="mini-description">Une boutique de vêtements et cadeaux du Mile End.</p><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Mimi+%26+Coco+Mile+End+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></article><article class="mini"><figure><img src="img/murales.jpg" alt="Une murale dans le Mile End" width="960" height="1280" loading="lazy"><figcaption><a href="https://commons.wikimedia.org/wiki/File:20181013_-_05_-_Montreal_(Mile_End).jpg" target="_blank" rel="noopener">Photo : Andre Carrotflower, CC BY-SA 4.0</a></figcaption></figure><h3>Les murales du Mile End</h3><p class="mini-description">Des fresques géantes à découvrir au détour des ruelles.</p><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Murales+Mile+End+Montreal" target="_blank" rel="noopener">Voir sur la carte<span aria-hidden="true"> ↗</span></a></article><article class="mini"><figure><img src="img/wilensky.jpg" alt="Wilensky’s Light Lunch" loading="lazy"><figcaption><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Wilensky%27s_-_1.jpg">Photo : Anna Frodesiak, CC BY-SA 3.0</a></figcaption></figure><h3>Wilensky’s Light Lunch</h3><p class="address">34 Av. Fairmount O.</p><p class="mini-description">Le comptoir à sandwichs mythique depuis 1932, célèbre pour son « Wilensky Special ».</p><a class="button" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=Wilensky%27s+Light+Lunch+34+Av+Fairmount+O+Montreal">Voir sur la carte ↗</a></article><article class="mini"><figure><img src="img/pickup.jpg" alt="Dépanneur Le Pick Up — photo d’illustration du Mile End" loading="lazy"><figcaption><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Montr%C3%A9al_Mile_end_434_(8338544214).jpg">Photo : Alain Rouiller, CC BY-SA 2.0</a> — photo d’illustration du Mile End</figcaption></figure><h3>Dépanneur Le Pick Up</h3><p class="address">7032 Rue Waverly (Mile-Ex)</p><p class="mini-description">Un dépanneur rétro avec comptoir à sandwichs et terrasse, adoré du quartier.</p><a class="button" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=Depanneur+Le+Pick+Up+7032+Rue+Waverly+Montreal">Voir sur la carte ↗</a></article><article class="mini"><figure><img src="img/casa.jpg" alt="Casa del Popolo" loading="lazy"><figcaption><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Victoria_Vox_dehors_Casa_Del_Popolo.jpg">Photo : Bull-Doser, Public domain</a></figcaption></figure><h3>Casa del Popolo</h3><p class="address">4873 Boul. Saint-Laurent</p><p class="mini-description">Bar, resto végé et salle de concerts indépendants depuis 2000.</p><a class="button" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=Casa+del+Popolo+4873+Boul+Saint-Laurent+Montreal">Voir sur la carte ↗</a></article><article class="mini"><figure><img src="img/champ.jpg" alt="Champ des Possibles" loading="lazy"><figcaption><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Champ_des_possibles_-_01.JPG">Photo : Jeangagnon, CC BY-SA 3.0</a></figcaption></figure><h3>Champ des Possibles</h3><p class="address">Rue Saint-Viateur E. / Rue De Gaspé</p><p class="mini-description">Un espace vert sauvage, cogéré par les citoyens, au bord de la voie ferrée.</p><a class="button" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=Champ+des+Possibles+Montreal">Voir sur la carte ↗</a></article></div><footer><p>Réalisé par Manushi, Preshita, Fariba et Arina</p><p>Crédits photos : Wikimedia Commons et Archives de la Ville de Montréal, sous les licences indiquées auprès de chaque photo. Photo de Drogheria Fine : l’équipe.</p><ul class="all-credits"><li>fairmount — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Iconic_Storefront_Fairmount_Bagel.png">Photo : Jamie, CC BY 2.0</a></li><li>drogheria — Photo : l&#x27;équipe (Manushi, Preshita, Fariba, Arina)</li><li>olimpico — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:20160904_-_01_-_Montreal_(Mile_End).jpg">Photo : Andre Carrotflower, CC BY-SA 4.0</a></li><li>eglise — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Church_of_St._Michael_and_St._Anthony.jpg">Photo : Jeangagnon, CC BY-SA 3.0</a></li><li>rialto — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Rialto_Theatre_Montreal_01.jpg">Photo : Jeangagnon, CC BY-SA 3.0</a></li><li>eglise-1916 — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Eglise_St._Michael_en_construction_1916.jpg">Photo : Construction Journal, janvier 1916, Domaine public</a></li><li>rialto-1936 — <a target="_blank" rel="noopener" href="https://archivesdemontreal.com/nous-joindre/">Photo : Archives de la Ville de Montréal. CA M001 VM094-Y-1-17-D0118 (1er avril 1936), CC BY-NC-SA 4.0</a></li><li>stviateur — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:St-Viateur_Bagel_-_158_Saint-Viateur_Ouest_-_01.jpg">Photo : Jeangagnon, CC BY-SA 3.0</a></li><li>murales — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:20181013_-_05_-_Montreal_(Mile_End).jpg">Photo : Andre Carrotflower, CC BY-SA 4.0</a></li><li>alfred — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:20181013_-_01_-_Montreal_(Mile_End).jpg">Photo : Andre Carrotflower, CC BY-SA 4.0</a> — photo d&#x27;illustration du Mile End</li><li>mimicoco — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Avenue_Bernard.jpg">Photo : GuyofMshire, CC BY 4.0</a> — photo d&#x27;illustration du Mile End</li><li>hero-mural — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Graffiti_in_Mile_End_02.jpg">Photo : Bohemian Baltimore, CC BY-SA 4.0</a></li><li>eglise-1922 — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Interior_St_Michael%27s_Church,_Montreal_(HS85-10-39629).jpg">Photo : Alfred Hunter Ward, Public domain</a></li><li>eglise-2007 — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Eglise_St_Michael.JPG">Photo : Mourial, CC BY 3.0</a></li><li>eglise-2025 — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Church_of_St._Michael_and_St._Anthony_exterior,_November_2025.jpg">Photo : Jason Zhang, CC BY-SA 4.0</a></li><li>rialto-2011 — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Cin%C3%A9ma_Rialto_2011.jpg">Photo : Philippe Du Berger, CC BY 2.0</a></li><li>rialto-2017 — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Th%C3%A9%C3%A2tre_Rialto_(2017)_photo_01.jpg">Photo : Pierre5018, CC BY-SA 4.0</a></li><li>wilensky — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Wilensky%27s_-_1.jpg">Photo : Anna Frodesiak, CC BY-SA 3.0</a></li><li>pickup — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Montr%C3%A9al_Mile_end_434_(8338544214).jpg">Photo : Alain Rouiller, CC BY-SA 2.0</a></li><li>casa — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Victoria_Vox_dehors_Casa_Del_Popolo.jpg">Photo : Bull-Doser, Public domain</a></li><li>champ — <a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Champ_des_possibles_-_01.JPG">Photo : Jeangagnon, CC BY-SA 3.0</a></li><li><a target="_blank" rel="noopener" href="https://commons.wikimedia.org/wiki/File:Lofi_music_001.wav">Musique : « Lofi music 001 » par Luisalvaz, CC0 (Wikimedia Commons)</a></li><li><a target="_blank" rel="noopener" href="https://www.tiktok.com/@ashers.appetite/video/7694392059808992533">Vidéo : @ashers.appetite (TikTok)</a></li><li><a target="_blank" rel="noopener" href="https://www.instagram.com/reel/Dczfn6Wp-fk/">Vidéo : @derryx (Instagram)</a></li></ul><a href="#intro">Revenir au début ↑</a></footer></div></section><section class="snap route" id="itineraire" aria-label="Itinéraire à pied"><div class="scene"><div class="route-media"><video id="route-map-video" src="img/route-map.mp4" poster="map-3d-phone.png" muted autoplay loop playsinline preload="metadata"></video><button id="route-toggle" hidden aria-pressed="false">▶ Clip</button><video id="route-video" hidden muted loop playsinline preload="metadata" src="img/route-walk.mp4" poster="map-3d.png"></video></div></div></section></main><audio id="bgm" src="audio/lofi-mile-end.mp3" loop preload="none"></audio><button id="music-toggle" aria-label="Couper la musique" aria-pressed="false">🔊</button><script>
 (() => {
   'use strict';
+  // Add a photo to either list with src, year, credit and href; alt and archive are optional.
+  const TIMELINES = {
+  "eglise": [
+    {
+      "src": "img/eglise-1916.jpg",
+      "year": "1916",
+      "credit": "Photo : Construction Journal, janvier 1916, Domaine public",
+      "href": "https://commons.wikimedia.org/wiki/File:Eglise_St._Michael_en_construction_1916.jpg",
+      "alt": "1916 construction",
+      "archive": true
+    },
+    {
+      "src": "img/eglise-1922.jpg",
+      "year": "1922",
+      "credit": "Photo : Alfred Hunter Ward, Public domain",
+      "href": "https://commons.wikimedia.org/wiki/File:Interior_St_Michael%27s_Church,_Montreal_(HS85-10-39629).jpg",
+      "alt": "1922 intérieur",
+      "archive": true
+    },
+    {
+      "src": "img/eglise-2007.jpg",
+      "year": "2007",
+      "credit": "Photo : Mourial, CC BY 3.0",
+      "href": "https://commons.wikimedia.org/wiki/File:Eglise_St_Michael.JPG",
+      "alt": "2007",
+      "archive": false
+    },
+    {
+      "src": "img/eglise.jpg",
+      "year": "2013",
+      "credit": "Photo : Jeangagnon, CC BY-SA 3.0",
+      "href": "https://commons.wikimedia.org/wiki/File:Church_of_St._Michael_and_St._Anthony.jpg",
+      "alt": "2013",
+      "archive": false
+    },
+    {
+      "src": "img/eglise-2025.jpg",
+      "year": "Aujourd’hui",
+      "credit": "Photo : Jason Zhang, CC BY-SA 4.0",
+      "href": "https://commons.wikimedia.org/wiki/File:Church_of_St._Michael_and_St._Anthony_exterior,_November_2025.jpg",
+      "alt": "Aujourd’hui",
+      "archive": false
+    }
+  ],
+  "rialto": [
+    {
+      "src": "img/rialto-1936.jpg",
+      "year": "1936",
+      "credit": "Photo : Archives de la Ville de Montréal. CA M001 VM094-Y-1-17-D0118 (1er avril 1936), CC BY-NC-SA 4.0",
+      "href": "https://archivesdemontreal.com/nous-joindre/",
+      "alt": "1936",
+      "archive": true
+    },
+    {
+      "src": "img/rialto-2011.jpg",
+      "year": "2011",
+      "credit": "Photo : Philippe Du Berger, CC BY 2.0",
+      "href": "https://commons.wikimedia.org/wiki/File:Cin%C3%A9ma_Rialto_2011.jpg",
+      "alt": "2011 détail de la façade",
+      "archive": false
+    },
+    {
+      "src": "img/rialto.jpg",
+      "year": "2011",
+      "credit": "Photo : Jeangagnon, CC BY-SA 3.0",
+      "href": "https://commons.wikimedia.org/wiki/File:Rialto_Theatre_Montreal_01.jpg",
+      "alt": "2011 façade",
+      "archive": false
+    },
+    {
+      "src": "img/rialto-2017.jpg",
+      "year": "Aujourd’hui",
+      "credit": "Photo : Pierre5018, CC BY-SA 4.0",
+      "href": "https://commons.wikimedia.org/wiki/File:Th%C3%A9%C3%A2tre_Rialto_(2017)_photo_01.jpg",
+      "alt": "Aujourd’hui",
+      "archive": false
+    }
+  ]
+};
+  document.querySelectorAll('[data-timeline]').forEach(stop => {
+    const media = stop.querySelector('.timeline'), dots = stop.querySelector('.timeline-dots');
+    const credit = stop.querySelector('.photo-credit');
+    credit.replaceChildren();
+    TIMELINES[stop.dataset.timeline].forEach(photo => {
+      const image = document.createElement('img');
+      image.className = 'timeline-photo' + (photo.archive ? ' archive' : '');
+      image.src = photo.src; image.alt = photo.alt || photo.year;
+      image.dataset.label = photo.year; image.loading = 'lazy';
+      media.insertBefore(image, media.querySelector('.era'));
+      const dot = document.createElement('button');
+      dot.setAttribute('aria-label', image.alt); dot.setAttribute('aria-pressed', 'false'); dots.append(dot);
+      const link = document.createElement('a'); link.href = photo.href; link.textContent = photo.credit;
+      link.target = '_blank'; link.rel = 'noopener';
+      credit.append(document.createTextNode(photo.year + ' — '), link, document.createElement('br'));
+    });
+  });
+
   const scroller = document.querySelector('main');
   const snaps = [...document.querySelectorAll('.snap')];
   const stops = [...document.querySelectorAll('.stop')];
@@ -50,7 +161,6 @@
   const segments = [...document.querySelectorAll('.segment i')];
   let pending = false, active = null, frameIndex = 0;
   const animations = new Map();
-  addEventListener('map:stop', event => { const target=document.querySelector(`#arret-${event.detail.n}`); if(target) go(snaps.indexOf(target)); });
   const bgm=document.querySelector('#bgm'), musicButton=document.querySelector('#music-toggle');
   let muted=false, started=false, duckUntil=0, fadeFrame=0, duckTimer=0;
   try { muted=localStorage.getItem('mile-end-music-muted')==='true'; } catch {}
@@ -143,7 +253,7 @@
     ['pointerdown','input','keydown','click'].forEach(type => panel.addEventListener(type,()=>arm(stop),{passive:true}));
     panel.querySelector('.read-more').setAttribute('aria-controls','sheet-title');
     panel.querySelector('.read-more').addEventListener('click',event=>openSheet(stop,event.currentTarget));
-    if (stop.dataset.video) {
+    if (stop.dataset.provider) {
       const food = document.createElement('button'); food.className = 'food-open';
       food.textContent = ['🥡','🥯','☕'][stops.indexOf(stop)]; food.setAttribute('aria-label','Voir la scène 3D');
       food.addEventListener('click',()=>openSheet(stop,food)); panel.append(food);
@@ -188,37 +298,58 @@
   function schedule() { if (!pending) { pending = true; requestAnimationFrame(render); } }
   scroller.addEventListener('scroll', schedule, { passive: true });
   addEventListener('resize', schedule);
-  const videoTimers = new Map();
-  function removeVideos() {
-    videoTimers.forEach(clearInterval); videoTimers.clear();
-    document.querySelectorAll('.video-slot iframe').forEach(iframe => iframe.remove());
-    document.querySelectorAll('.video-poster').forEach(poster => { poster.hidden = false; });
+  const videoStates = new Map();
+  function swipeMode(stop) {
+    const state = videoStates.get(stop); if (!state) return;
+    clearTimeout(state.timer); stop.classList.remove('video-interact');
+    state.chip.textContent = 'Touchez pour contrôler la vidéo';
+    state.chip.setAttribute('aria-pressed', 'false');
   }
-  function loadVideo(stop, autoplay) {
-    if (active !== stop || stop.querySelector('iframe')) return;
+  function removeVideo(stop) {
+    stop.querySelector('.video-slot iframe')?.remove();
+    const poster = stop.querySelector('.video-poster'); if (poster) poster.hidden = false;
+    swipeMode(stop);
+  }
+  function removeVideos() { stops.filter(stop => stop.dataset.provider).forEach(removeVideo); }
+  function loadVideo(stop) {
+    if (active !== stop || stop.querySelector('iframe') || document.hidden) return;
     removeVideos();
-    const id = stop.dataset.video;
     const iframe = document.createElement('iframe');
     iframe.title = 'Vidéo : ' + stop.querySelector('h2').textContent;
-    iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-    iframe.allowFullscreen = true;
-    const start = Number(stop.dataset.start), end = Number(stop.dataset.end);
-    const source = `https://www.youtube-nocookie.com/embed/${id}?autoplay=${autoplay ? 1 : 0}&mute=1&playsinline=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${id}&start=${start}&end=${end}`;
-    iframe.src = source;
+    iframe.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
+    iframe.allowFullscreen = true; iframe.src = stop.dataset.src;
     iframe.addEventListener('load', () => {
-      if (active !== stop || !iframe.isConnected) return;
-      clearInterval(videoTimers.get(stop));
-      videoTimers.set(stop, setInterval(() => {
-        if (active === stop && !document.hidden && iframe.isConnected) iframe.src = source;
-      }, (end-start)*1000));
-      iframe.classList.add('loaded');
-      stop.querySelector('.video-poster').hidden = true;
+      if (!iframe.isConnected) return;
+      iframe.classList.add('loaded'); stop.querySelector('.video-poster').hidden = true;
     });
     stop.querySelector('.video-slot').append(iframe);
     stop.querySelector('.play').hidden = true;
   }
-  stops.filter(stop => stop.dataset.video).forEach(stop => {
-    stop.querySelector('.play').addEventListener('click', () => loadVideo(stop, true));
+  stops.filter(stop => stop.dataset.provider).forEach(stop => {
+    const media = stop.querySelector('.media');
+    const layer = document.createElement('div'); layer.className = 'video-swipe';
+    const chip = document.createElement('button'); chip.className = 'video-mode';
+    chip.setAttribute('aria-pressed', 'false');
+    videoStates.set(stop, {chip, timer: 0});
+    function toggleMode() {
+      if (stop.classList.contains('video-interact')) { swipeMode(stop); return; }
+      if (!stop.querySelector('iframe')) return;
+      stop.classList.add('video-interact'); chip.textContent = 'Mode vidéo';
+      chip.setAttribute('aria-pressed', 'true');
+      videoStates.get(stop).timer = setTimeout(() => swipeMode(stop), 8000);
+    }
+    let tap;
+    layer.addEventListener('pointerdown', e => { tap = {x:e.clientX,y:e.clientY}; }, {passive:true});
+    layer.addEventListener('pointermove', e => { if(tap && Math.hypot(e.clientX-tap.x,e.clientY-tap.y)>10) tap=null; }, {passive:true});
+    layer.addEventListener('pointercancel', () => {tap=null;});
+    layer.addEventListener('pointerup', e => {
+      if(tap && Math.hypot(e.clientX-tap.x,e.clientY-tap.y)<=10) toggleMode(); tap=null;
+    });
+    chip.addEventListener('click', toggleMode);
+    media.append(layer, chip);
+    ['top','bottom'].forEach(edge => {const band=document.createElement('div');band.className='video-edge '+edge;media.append(band);});
+    swipeMode(stop);
+    stop.querySelector('.play').addEventListener('click', () => loadVideo(stop));
   });
   function cancelSweep(stop) {
     cancelAnimationFrame(animations.get(stop));
@@ -256,36 +387,32 @@
       if (entry.intersectionRatio >= .6) {
         active = stop;
         reveal(stop);
-        if (stop.dataset.video) {
-          stop.querySelector('.play').hidden = !reduced.matches;
-          if (!reduced.matches && !document.hidden) loadVideo(stop, true);
+        if (stop.dataset.provider) {
+          stop.querySelector('.play').hidden = true;
+          if (!document.hidden) loadVideo(stop);
         } else if (!reduced.matches && !document.hidden) {
           sweep(stop);
         }
-      } else {
+      } else if (entry.intersectionRatio < .4) {
         cancelSweep(stop);
         clearTimeout(panels.get(stop).timer);
-        clearInterval(videoTimers.get(stop)); videoTimers.delete(stop);
-        const iframe = stop.querySelector('iframe');
-        if (iframe) iframe.remove();
-        const poster = stop.querySelector('.video-poster');
-        if (poster) poster.hidden = false;
+        removeVideo(stop);
         if (active === stop) active = null;
       }
     });
-  }, { root: scroller, threshold: [0, .6] });
+  }, { root: scroller, threshold: [0, .4, .6] });
   stops.forEach(stop => observer.observe(stop));
   reduced.addEventListener('change', () => {
     removeVideos();
     stops.forEach(cancelSweep);
     stops.filter(stop=>stop.dataset.year).forEach(stop=>{ if(reduced.matches) showPhoto(stop,stop.querySelectorAll(".timeline-photo").length-1); });
-    stops.filter(stop => stop.dataset.video).forEach(stop => { stop.querySelector('.play').hidden = !reduced.matches; });
-    if (active?.dataset.video && !reduced.matches) loadVideo(active, true);
+    stops.filter(stop => stop.dataset.provider).forEach(stop => { stop.querySelector('.play').hidden = true; });
+    if (active?.dataset.provider) loadVideo(active);
     schedule();
   });
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { removeVideos(); stops.forEach(cancelSweep); panels.forEach(state=>clearTimeout(state.timer)); }
-    else { if (active) arm(active); if (active?.dataset.year && !reduced.matches) sweep(active); if (active?.dataset.video && !reduced.matches) loadVideo(active, true); }
+    else { if (active) arm(active); if (active?.dataset.year && !reduced.matches) sweep(active); if (active?.dataset.provider) loadVideo(active); }
   });
   render();
 })();
@@ -484,72 +611,27 @@ motion.addEventListener('change',()=>badges.forEach(s=>{pause(s);requestDraw(s);
 document.addEventListener('visibilitychange',()=>badges.forEach(s=>document.hidden?pause(s):requestDraw(s)));
 </script>
 
-<script type="module">
-const mapHost = document.querySelector('#route-map3d');
-const routeSection = document.querySelector('#itineraire');
-const mapRoot = document.querySelector('#circuit');
-const mapMotion = matchMedia('(prefers-reduced-motion: reduce)');
-const mapPanel = document.querySelector('#map-panel');
+<script>
+const mapVideo = document.querySelector('#route-map-video');
 const routeVideo = document.querySelector('#route-video');
-let selectedView = 'map';
-function showRouteVideo() {
-  selectedView = 'video';
-  mapPanel.hidden = true;
-  routeVideo.hidden = false;
-  pauseMap();
-  if (mapVisible && !document.hidden) routeVideo.play().catch(() => {});
-  else routeVideo.pause();
-}
-function videoFallback() {
-  selectedView = 'map';
-  routeVideo.pause();
-  routeVideo.hidden = true;
-  mapPanel.hidden = false;
-  resumeMap();
-}
 const routeToggle = document.querySelector('#route-toggle');
-routeVideo.autoplay = false;
-routeVideo.addEventListener('loadeddata', () => { routeToggle.hidden = false; });
-routeToggle.addEventListener('click', () => {
-  if (selectedView === 'map') showRouteVideo(); else videoFallback();
-  routeToggle.textContent = selectedView === 'map' ? '▶ Clip' : '⌖ Carte';
-  routeToggle.setAttribute('aria-pressed', String(selectedView === 'video'));
-});
-routeVideo.addEventListener('error', () => { routeToggle.hidden = true; videoFallback(); });
-let routeMap, mapLoading = false, mapVisible = false, mapFrame = 0;
-function pauseMap() { cancelAnimationFrame(mapFrame); mapFrame = 0; }
-function drawMap(time) {
-  mapFrame = 0;
-  if (!routeMap || !mapVisible || selectedView !== 'map' || document.hidden) return;
-  routeMap.render(mapMotion.matches ? 0 : time);
-  if (!mapMotion.matches) mapFrame = requestAnimationFrame(drawMap);
+let clipSelected = false, routeVisible = false;
+function updateRoute() {
+  mapVideo.hidden = clipSelected; routeVideo.hidden = !clipSelected;
+  routeToggle.textContent = clipSelected ? '⌖ Carte' : '▶ Clip';
+  routeToggle.setAttribute('aria-pressed', String(clipSelected));
+  [mapVideo, routeVideo].forEach(video => {
+    if (!video.hidden && routeVisible && !document.hidden) video.play().catch(() => {});
+    else video.pause();
+  });
 }
-function resumeMap() { if (routeMap && mapVisible && selectedView === 'map' && !document.hidden && !mapFrame) mapFrame = requestAnimationFrame(drawMap); }
-const nearMap = new IntersectionObserver(async entries => {
-  if (!entries.some(entry => entry.isIntersecting) || mapLoading) return;
-  mapLoading = true;
-  try {
-    const { mountMap3D } = await import('./map3d.js');
-    await document.fonts.load('48px "Bebas Neue"');
-    mapHost.hidden = false;
-    routeMap = mountMap3D(mapHost, { interactive: true, width: mapHost.clientWidth, height: mapHost.clientHeight, pixelRatio: Math.min(devicePixelRatio || 1, 2) });
-    document.querySelector('#map-poster').hidden = true;
-    mapHost.addEventListener('webglcontextlost', event => { event.preventDefault(); pauseMap(); mapHost.hidden = true; document.querySelector('#map-poster').hidden = false; });
-    resumeMap();
-  } catch { routeMap?.dispose(); mapHost.hidden = true; document.querySelector('#map-poster').hidden = false; }
-  nearMap.disconnect();
-}, { root: mapRoot, rootMargin: '100% 0px' });
-nearMap.observe(routeSection);
-const visibleMap = new IntersectionObserver(entries => {
-  mapVisible = entries[0].isIntersecting;
-  if (mapVisible) { resumeMap(); if (selectedView === 'video') routeVideo.play().catch(() => {}); } else { pauseMap(); routeVideo.pause(); }
-}, { root: mapRoot });
-visibleMap.observe(routeSection);
-document.addEventListener('visibilitychange', () => { pauseMap(); resumeMap(); if (document.hidden) routeVideo.pause(); else if (mapVisible && selectedView === 'video') routeVideo.play().catch(() => {}); });
-mapMotion.addEventListener('change', () => { pauseMap(); resumeMap(); });
-addEventListener('pagehide', event => { pauseMap(); if (!event.persisted) routeMap?.dispose(); });
-addEventListener('pageshow', resumeMap);
-if (routeVideo.error) videoFallback();
-else if (routeVideo.readyState >= 2) routeToggle.hidden = false;
+routeVideo.addEventListener('loadeddata', () => { routeToggle.hidden = false; });
+routeVideo.addEventListener('error', () => { routeToggle.hidden = true; clipSelected = false; updateRoute(); });
+routeToggle.addEventListener('click', () => { clipSelected = !clipSelected; updateRoute(); });
+new IntersectionObserver(entries => {
+  routeVisible = entries[0].isIntersecting; updateRoute();
+}, {root: document.querySelector('#circuit')}).observe(document.querySelector('#itineraire'));
+document.addEventListener('visibilitychange', updateRoute);
+if (routeVideo.readyState >= 2) routeToggle.hidden = false;
 </script>
 </body></html>
