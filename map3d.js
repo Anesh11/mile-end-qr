@@ -289,12 +289,44 @@ export function mountMap3D(container, { interactive = true, width = container.cl
   const contactMaterial=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(shadowCanvas),transparent:true,depthWrite:false});
   const buildings=district.children.filter(o=>o.geometry?.type==='BoxGeometry' && o.position.y>.1);
   buildings.forEach(o=>{const footprint=mesh(new THREE.PlaneGeometry(o.geometry.parameters.width+.5,o.geometry.parameters.depth+.5),contactMaterial,o.position.x,.025,o.position.z);footprint.rotation.x=-Math.PI/2;footprint.castShadow=false;});
+  const narrowInteractive = interactive && (aspect < 1 || width < 600);
+  const fittedTarget = new THREE.Vector3();
+  if (narrowInteractive) {
+    scene.updateMatrixWorld(true);
+    camera.updateMatrixWorld(true);
+    // Align the route's principal axis with the portrait frame's vertical axis.
+    const points = Array.from({length:250}, (_,i) => district.localToWorld(curve.getPoint(i/249)));
+    const projected = points.map(p => p.clone().applyMatrix4(camera.matrixWorldInverse));
+    const mean = projected.reduce((sum,p) => sum.add(p),new THREE.Vector3()).divideScalar(projected.length);
+    let xx=0, xy=0, yy=0;
+    projected.forEach(p => { const x=p.x-mean.x, y=p.y-mean.y; xx+=x*x; xy+=x*y; yy+=y*y; });
+    const angle = .5*Math.atan2(2*xy,xx-yy);
+    const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0);
+    const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,1);
+    camera.up.copy(right.multiplyScalar(Math.cos(angle)).add(up.multiplyScalar(Math.sin(angle))));
+    camera.lookAt(fittedTarget);
+    camera.updateMatrixWorld(true);
+    // Fit the whole path and full pin silhouettes with 12% margin on each side.
+    STOPS.forEach(stop => {
+      for (const x of [-.65,.65]) for (const z of [-.65,.65]) for (const y of [0,stop.pinHeight+.65]) {
+        points.push(district.localToWorld(new THREE.Vector3(stop.position[0]+x,y,stop.position[1]+z)));
+      }
+    });
+    const bounds = new THREE.Box3().setFromPoints(points.map(p => p.clone().applyMatrix4(camera.matrixWorldInverse)));
+    const center = bounds.getCenter(new THREE.Vector3());
+    const offset = new THREE.Vector3(center.x,center.y,0).applyQuaternion(camera.quaternion);
+    camera.position.add(offset); fittedTarget.add(offset);
+    const size = bounds.getSize(new THREE.Vector3());
+    camera.zoom = Math.min((camera.right-camera.left)/size.x,(camera.top-camera.bottom)/size.y)/1.24;
+    camera.updateProjectionMatrix();
+  }
   const controls = interactive ? new OrbitControls(camera, renderer.domElement) : null;
   if (controls) {
+    controls.target.copy(fittedTarget);
     controls.enablePan = false; controls.enableDamping = false;
     controls.minPolarAngle = Math.PI / 5; controls.maxPolarAngle = Math.PI / 2.7;
     controls.minAzimuthAngle = Math.PI / 12; controls.maxAzimuthAngle = Math.PI * 5 / 12;
-    controls.minZoom = .75; controls.maxZoom = 2; controls.enableZoom = true;
+    controls.minZoom = narrowInteractive ? camera.zoom*.75 : .75; controls.maxZoom = narrowInteractive ? camera.zoom*2 : 2; controls.enableZoom = true;
     // Leave wheel scrolling to the itinerary; two-finger pinch still zooms.
     controls.mouseButtons.MIDDLE = null;
     controls.domElement.addEventListener('wheel', passWheel, { capture: true });
@@ -339,7 +371,8 @@ export function mountMap3D(container, { interactive = true, width = container.cl
       const worldAnchor = district.localToWorld(anchor.clone());
       const projected = worldAnchor.clone().project(camera);
       const px = (projected.x+1)*width/2, py = (1-projected.y)*height/2;
-      const h = height * .03 / textFraction, w = h*ratio;
+      const h = interactive ? Math.min(height*.026/textFraction,(width-24)/ratio) : height*.03/textFraction;
+      const w = h*ratio;
       const gap = Math.min(width,height)*.025;
       // Try nearby card edges; all candidates keep the leader within 12% of the frame.
       const candidates = [];
