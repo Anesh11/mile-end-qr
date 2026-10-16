@@ -9,3 +9,15 @@
 - prefers-reduced-motion: no parallax/3D/Ken-Burns, then/now shows a simple crossfade without auto-animation; videos do not autoplay (show a play button that loads the iframe on tap).
 - Fast on phones: transforms/opacity only, rAF-throttled scroll handler, images lazy except hero and stop 1.
 Only edit index.html.
+
+# ADDENDUM 3D FOOD (do after layout)
+- three.js via ES module CDN: import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js' (dynamic import(), only when needed). Build all models PROCEDURALLY (no GLB):
+  * Fairmount (stop 1): sesame bagel = TorusGeometry (golden-brown MeshStandardMaterial, slight noise via vertex displacement) + ~300 InstancedMesh sesame seeds (small stretched spheres) on the top surface; slow spin.
+  * Drogheria (stop 2): NO plate. Small white Chinese-style takeout carton (oyster pail: tapered square box, folded top flaps, thin metal wire handle as TubeGeometry) filled with red tomato sauce and ~20 gnocchi (ridged capsules, instanced) peeking out the top, grated Pecorino (tiny pale instanced flakes) on top, a few red chili flakes, a pair of wooden chopsticks stuck in, and a little steam (few sprites). Rotates and floats (sin bob) tied to scroll.
+  * Olimpico (stop 3): espresso cup + saucer (LatheGeometry, white ceramic), dark coffee disc, handle (TorusGeometry partial), rising steam = ~60 soft additive sprite particles (canvas-generated radial texture) looping upward.
+- Placement: a small transparent canvas (~150-180px square) floating in the overlay above the name ("3D badge"), with a tap "✨" that bursts confetti/particles (sesame, basil, coffee beans as tiny meshes or CSS confetti).
+- Interaction: pointer/touch drag rotates the object (inertia); gyroscope tilt via deviceorientation; on iOS, request DeviceOrientationEvent.requestPermission() only from a user tap (a small "Activer l'inclinaison" chip shown only when that API exists).
+- Performance: create a scene only when its card is within one screen (IntersectionObserver rootMargin '100% 0px'), pause the render loop (cancel rAF) when off-screen, dispose on far away optional; renderer antialias true, setPixelRatio(Math.min(devicePixelRatio,2)), alpha true, low poly counts, shared single lights. prefers-reduced-motion: static render, no auto-spin/steam, drag still allowed. If WebGL/import fails, hide the canvas silently.
+- Lighting: hemisphere + directional; warm tones.
+
+- Drogheria card: add the price line "5 $, ou 6 $ avec fromage" (small note: source Montreal Gazette). Drogheria photo is img/drogheria-equipe.jpg (team photo); no gnocchi stock photo anywhere.
