@@ -1,0 +1,44 @@
+{
+ "fairmount": {
+  "file": "File:Iconic Storefront Fairmount Bagel.png",
+  "author": "Jamie",
+  "license": "CC BY 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Iconic_Storefront_Fairmount_Bagel.png"
+ },
+ "drogheria": {
+  "file": "File:Gnocchi al pomodoro.JPG",
+  "author": "Ivan Vighetto",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Gnocchi_al_pomodoro.JPG",
+  "note": "Photo d'illustration (gnocchis), pas la boutique"
+ },
+ "olimpico": {
+  "file": "File:20160904 - 01 - Montreal (Mile End).jpg",
+  "author": "Andre Carrotflower",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:20160904_-_01_-_Montreal_(Mile_End).jpg"
+ },
+ "eglise": {
+  "file": "File:Church of St. Michael and St. Anthony.jpg",
+  "author": "Jeangagnon",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Church_of_St._Michael_and_St._Anthony.jpg"
+ },
+ "rialto": {
+  "file": "File:Rialto Theatre Montreal 01.jpg",
+  "author": "Jeangagnon",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Rialto_Theatre_Montreal_01.jpg"
+ },
+ "eglise-1916": {
+  "file": "File:Eglise St. Michael en construction 1916.jpg",
+  "author": "Construction Journal, janvier 1916",
+  "license": "Domaine public",
+  "page": "https://commons.wikimedia.org/wiki/File:Eglise_St._Michael_en_construction_1916.jpg"
+ },
+ "rialto-1936": {
+  "author": "Archives de la Ville de Montréal. CA M001 VM094-Y-1-17-D0118 (1er avril 1936)",
+  "license": "CC BY-NC-SA 4.0",
+  "page": "https://archivesdemontreal.com/nous-joindre/"
+ }
+}
