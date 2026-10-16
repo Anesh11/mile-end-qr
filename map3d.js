@@ -155,10 +155,28 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     const core = new THREE.Mesh(chevronGeometry(.48,.46,.13),overlay('#ffffff'));
     outline.material.side = core.material.side = THREE.DoubleSide;
     outline.renderOrder = 102; core.renderOrder = 103;
-    arrow.add(outline,core); district.add(arrow);
+    arrow.add(outline,core); arrow.scale.setScalar(2); district.add(arrow);
     return arrow;
   });
   const callouts = [];
+  let labelOverlay = null, labelStyle = null, leaderSvg = null;
+  const originalPosition = container.style.position;
+  if (interactive) {
+    if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
+    labelStyle = document.createElement('style');
+    labelStyle.textContent = `
+      .map3d-labels{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2}
+      .map3d-labels svg{position:absolute;inset:0;width:100%;height:100%}
+      .map3d-label{position:absolute;box-sizing:border-box;display:flex;align-items:center;gap:6px;padding:5px 8px;background:white;color:#1b2a4a;border:0;border-radius:18px;box-shadow:0 2px 8px #1b2a4a44;font:bold clamp(13px,3.6vw,18px)/1.05 "Bebas Neue",Impact,sans-serif;pointer-events:auto;transform-origin:center;transition:transform .2s,box-shadow .2s}
+      .map3d-label span{overflow-wrap:anywhere;text-align:left}
+      .map3d-label b{display:grid;place-items:center;flex-shrink:0;width:1.45em;height:1.45em;border-radius:50%;background:#e2761d;color:white}
+      .map3d-label.active{transform:scale(1.12);box-shadow:0 0 14px 4px #ff8a26aa}
+    `;
+    container.append(labelStyle);
+    labelOverlay = document.createElement('div'); labelOverlay.className = 'map3d-labels';
+    leaderSvg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    labelOverlay.append(leaderSvg); container.append(labelOverlay);
+  }
   function card(text, number) {
     const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d');
     ctx.font = 'bold 72px "Bebas Neue", Impact, sans-serif';
@@ -196,16 +214,27 @@ export function mountMap3D(container, { interactive = true, width = container.cl
         object.renderOrder = object === pin ? 110 : 111; object.castShadow=false;
       }
     });
-    if (mapOnly) district.children.slice(firstPin).forEach(object => {
+    district.children.slice(firstPin).forEach(object => {
       pinParts.push({object, origin: new THREE.Vector3(x,h,z), offset: object.position.clone().sub(new THREE.Vector3(x,h,z)), scale: object.scale.clone()});
     });
     if (interactive && stop.id !== 'metro') district.children.slice(firstPin).forEach(object => { object.userData.stopNumber=Number(stop.number); pickTargets.push(object); });
-    // Numbers appear once on the map, on their own pins.
-    const {sprite,ratio,textFraction} = card(stop.name, stop.id === 'metro' ? null : stop.number);
-    if (interactive && stop.id !== 'metro') { sprite.userData.stopNumber=Number(stop.number); pickTargets.push(sprite); }
-    const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:'#e2761d',depthTest:false,transparent:true,opacity:.8}));
-    line.renderOrder=109; scene.add(line);
-    callouts.push({stop,sprite,ratio,textFraction,line,anchor:new THREE.Vector3(x,h,z)});
+    const cardData = interactive ? {} : card(stop.name, stop.id === 'metro' ? null : stop.number);
+    let element, domLine, line;
+    if (interactive) {
+      element = document.createElement('button'); element.className = 'map3d-label';
+      const badge = document.createElement('b'); badge.textContent = stop.number;
+      const name = document.createElement('span'); name.textContent = stop.name;
+      element.append(badge,name); labelOverlay.append(element);
+      element.addEventListener('click', () => {
+        if (stop.id !== 'metro') window.dispatchEvent(new CustomEvent('map:stop',{detail:{n:Number(stop.number)}}));
+      });
+      domLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+      domLine.setAttribute('stroke','#e2761d'); domLine.setAttribute('stroke-width','1.5'); leaderSvg.append(domLine);
+    } else {
+      line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:'#e2761d',depthTest:false,transparent:true,opacity:.8}));
+      line.renderOrder=119; scene.add(line);
+    }
+    callouts.push({stop,...cardData,element,domLine,line,anchor:new THREE.Vector3(x,h,z)});
   });
   // One merged, vertex-coloured mesh per student, including articulated leg vertices.
   const students = [];
@@ -219,7 +248,7 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     journey.push({start:seconds,end:seconds+1.5,from:distance+length,to:distance+length,stop});
     seconds += 1.5; distance += length;
   });
-  if (interactive) ['#d35570','#5b98ca','#e8b646','#75a588'].forEach((shirt,index) => {
+  if (interactive) ['#ff3d7f','#3dd6ff','#ffd23d','#8a5cff'].forEach((shirt,index) => {
     const parts=[], legs=[];
     let count=0;
     function part(geometry,color,x,y,z,leg=0) {
@@ -242,7 +271,13 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     const geometry=mergeGeometries(parts);parts.forEach(g=>g.dispose());
     const figure=mesh(geometry,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.9}),0,0,0);
     figure.renderOrder=104; figure.material.depthTest=false;
-    students.push({figure,legs,base:geometry.attributes.position.array.slice(),index});
+    figure.scale.set(1.4,2.2,1.4);
+    const outline = new THREE.Mesh(geometry.clone(),new THREE.MeshBasicMaterial({color:'#ffffff',side:THREE.BackSide,depthTest:false,depthWrite:false}));
+    // Expand along vertex normals rather than scaling the whole body from its feet.
+    const vertices = outline.geometry.attributes.position, normals = outline.geometry.attributes.normal;
+    for (let i=0;i<vertices.count;i++) vertices.setXYZ(i,vertices.getX(i)+normals.getX(i)*.035,vertices.getY(i)+normals.getY(i)*.035,vertices.getZ(i)+normals.getZ(i)*.035);
+    outline.renderOrder=104; figure.renderOrder=105; figure.add(outline);
+    students.push({figure,outline,legs,base:geometry.attributes.position.array.slice(),outlineBase:vertices.array.slice(),index});
   });
   let walkTime=0, lastWalkFrame=null, pausedStop=null;
   function animateStudents(time) {
@@ -254,8 +289,8 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     pausedStop=leg.from===leg.to ? leg.stop.number : null;
     const fraction=(elapsed-leg.start)/(leg.end-leg.start);
     const progress=(leg.from+(leg.to-leg.from)*fraction)/distance;
-    students.forEach(({figure,legs,base,index})=>{
-      const t=Math.max(0,progress-index*.008), point=curve.getPoint(t), tangent=curve.getTangent(t);
+    students.forEach(({figure,outline,legs,base,outlineBase,index})=>{
+      const t=((progress-index*.6/distance)%1+1)%1, point=curve.getPoint(t), tangent=curve.getTangent(t);
       figure.position.copy(point);figure.position.y+=.10+(pausedStop?0:Math.sin(walkTime*9+index)*.035);
       figure.rotation.y=Math.atan2(tangent.x,tangent.z);
       const position=figure.geometry.attributes.position;
@@ -266,6 +301,14 @@ export function mountMap3D(container, { interactive = true, width = container.cl
           position.setXYZ(i,base[i*3],.39+y*Math.cos(angle)-z*Math.sin(angle),y*Math.sin(angle)+z*Math.cos(angle));
         }
       });position.needsUpdate=true;
+      const hull=outline.geometry.attributes.position;
+      legs.forEach(({start,end,sign})=>{
+        const angle=pausedStop?0:Math.sin(walkTime*9+index)*.32*sign;
+        for(let i=start;i<end;i++){
+          const y=outlineBase[i*3+1]-.39,z=outlineBase[i*3+2];
+          hull.setXYZ(i,outlineBase[i*3],.39+y*Math.cos(angle)-z*Math.sin(angle),y*Math.sin(angle)+z*Math.cos(angle));
+        }
+      }); hull.needsUpdate=true;
     });
   }
   const raycaster=new THREE.Raycaster(), pointer=new THREE.Vector2();
@@ -306,20 +349,26 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     camera.up.copy(right.multiplyScalar(Math.cos(angle)).add(up.multiplyScalar(Math.sin(angle))));
     camera.lookAt(fittedTarget);
     camera.updateMatrixWorld(true);
-    // Fit the whole path and full pin silhouettes with 12% margin on each side.
+  }
+  function fitCamera() {
+    scene.updateMatrixWorld(true); camera.updateMatrixWorld(true);
+    const samples = points.map(([x,z]) => district.localToWorld(new THREE.Vector3(x,.55,z)));
     STOPS.forEach(stop => {
-      for (const x of [-.65,.65]) for (const z of [-.65,.65]) for (const y of [0,stop.pinHeight+.65]) {
-        points.push(district.localToWorld(new THREE.Vector3(stop.position[0]+x,y,stop.position[1]+z)));
+      for (const dx of [-.65,.65]) for (const dy of [-.65,.65]) {
+        samples.push(district.localToWorld(new THREE.Vector3(stop.position[0]+dx,stop.pinHeight+dy,stop.position[1])));
       }
     });
-    const bounds = new THREE.Box3().setFromPoints(points.map(p => p.clone().applyMatrix4(camera.matrixWorldInverse)));
-    const center = bounds.getCenter(new THREE.Vector3());
-    const offset = new THREE.Vector3(center.x,center.y,0).applyQuaternion(camera.quaternion);
+    samples.push(district.localToWorld(new THREE.Vector3(-7.1,3.1,1.4)));
+    const bounds = new THREE.Box3().setFromPoints(samples.map(p=>p.applyMatrix4(camera.matrixWorldInverse)));
+    const center=bounds.getCenter(new THREE.Vector3()), size=bounds.getSize(new THREE.Vector3());
+    const offset=new THREE.Vector3(center.x,center.y,0).applyQuaternion(camera.quaternion);
     camera.position.add(offset); fittedTarget.add(offset);
-    const size = bounds.getSize(new THREE.Vector3());
-    camera.zoom = Math.min((camera.right-camera.left)/size.x,(camera.top-camera.bottom)/size.y)/1.24;
-    camera.updateProjectionMatrix();
+    const portrait=width<height, padding=portrait ? .14 : .10;
+    const roomX=Math.max(40,width*(1-2*padding)-(portrait?120:60));
+    camera.zoom=Math.min(roomX/width*(camera.right-camera.left)/size.x,(1-2*(portrait ? .12 : .10))*(camera.top-camera.bottom)/size.y);
+    camera.updateProjectionMatrix(); camera.updateMatrixWorld(true);
   }
+  fitCamera();
   const controls = interactive ? new OrbitControls(camera, renderer.domElement) : null;
   if (controls) {
     controls.target.copy(fittedTarget);
@@ -336,19 +385,6 @@ export function mountMap3D(container, { interactive = true, width = container.cl
   let disposed = false;
   function draw(time = 0, fitIteration = 0) {
     if (typeof time !== 'number') time = lastWalkFrame ?? 0;
-    if (mapOnly) {
-      const units = (camera.top-camera.bottom)/camera.zoom;
-      const scale = units/20 * 2;
-      pinParts.forEach(({object,origin,offset,scale: initial}) => {
-        object.position.copy(origin).addScaledVector(offset,scale);
-        object.scale.copy(initial).multiplyScalar(scale);
-      });
-      for (const [object, radius] of [[shoulder,.0195],[route,.015]]) {
-        object.geometry.dispose();
-        object.geometry = new THREE.TubeGeometry(curve,500,units*radius,16,false);
-      }
-      arrows.forEach(arrow => arrow.scale.setScalar(units/20));
-    }
     if (disposed) return;
     animateStudents(time);
     arrows.forEach((arrow, i) => {
@@ -365,97 +401,67 @@ export function mountMap3D(container, { interactive = true, width = container.cl
       const q = district.localToWorld(point.clone()).project(camera);
       return {x:(q.x+1)*width/2, y:(1-q.y)*height/2};
     };
-    const routeSamples = Array.from({length:250}, (_,i) => projectLocal(curve.getPoint(i/249).add(new THREE.Vector3(0,.37,0))));
-    const landmarks = STOPS.flatMap(stop => [0,.5,1,1.5,2].map(y => projectLocal(new THREE.Vector3(...[stop.position[0],y,stop.position[1]]))));
-    // Project after the portrait rotation/fit (and on every controls/animation draw).
-    // All interactive offsets and collision bounds below are in CSS pixels.
-    const screenPins = callouts.map(({anchor}) => projectLocal(anchor));
-    const firstPin = screenPins[1], secondPin = screenPins[2];
-    const firstOnLeft = firstPin.x <= secondPin.x;
-    callouts.forEach(({stop,sprite,ratio,textFraction,line,anchor}, index) => {
-      const worldAnchor = district.localToWorld(anchor.clone());
-      const projected = worldAnchor.clone().project(camera);
-      const px = (projected.x+1)*width/2, py = (1-projected.y)*height/2;
-      let h = interactive ? Math.min(height*.026/textFraction,(width-24)/ratio) : height*.03/textFraction;
-      let w = h*ratio;
-      const gap = Math.min(width,height)*.025;
-      // Try nearby card edges; all candidates keep the leader within 12% of the frame.
-      const candidates = [];
-      if (interactive) {
-        const margin = 8, leaderGap = 12;
-        const forcedSide = stop.number === '1' ? (firstOnLeft ? -1 : 1)
-          : stop.number === '2' ? (firstOnLeft ? 1 : -1) : null;
-        const available = side => side === 1 ? width-margin-px-leaderGap : px-margin-leaderGap;
-        const sides = forcedSide ? [forcedSide] : [1, -1];
-        // Keep the entire card beside its pin, shrinking only when neither side fits.
-        const room = Math.max(0, ...sides.map(available));
-        if (w > room) { w = room; h = w/ratio; }
-        const visible = px >= margin && px <= width-margin && py >= margin && py <= height-margin && room > 0;
-        sprite.visible = line.visible = visible;
-        for (const side of sides) {
-          if (available(side) < w) continue;
-          for (const dy of [0, -12, 12, -24, 24]) {
-            const cx = px + side*(leaderGap+w/2);
-            const cy = THREE.MathUtils.clamp(py+dy,h/2+margin,height-h/2-margin);
-            const edgeX = px+side*leaderGap;
-            const edgeY = THREE.MathUtils.clamp(py,cy-h/2,cy+h/2);
-            const length = Math.hypot(edgeX-px,edgeY-py);
-            if (length > 40) continue;
-            const overlap = occupied.reduce((sum,r) => sum + Math.max(0,Math.min(cx+w/2,r.right)-Math.max(cx-w/2,r.left)+4)*Math.max(0,Math.min(cy+h/2,r.bottom)-Math.max(cy-h/2,r.top)+4),0);
-            const pinOverlap = screenPins.reduce((sum,pin,i) => sum + (i !== index && Math.abs(cx-pin.x)<w/2+8 && Math.abs(cy-pin.y)<h/2+8 ? 1 : 0),0);
-            candidates.push({cx,cy,edgeX,edgeY,length,score:overlap*10000+pinOverlap*width*height+Math.abs(cy-py)*2+(side === 1 ? 0 : 1)});
-          }
-        }
-      }
-      if (!interactive) for (const distance of [gap, gap*2, gap*3, gap*5, gap*7, gap*9]) {
-        // Keep Olimpico below and right of its pin, away from the church dome.
-        const offsets = stop.id === 'olimpico'
-          ? [[w/2+distance,h/2+distance]]
-          : [[0,-h/2-distance],[0,h/2+distance],[-w/2-distance,0],[w/2+distance,0]];
-        for (const [dx,dy] of offsets) {
-          for (const nudge of (stop.id === 'olimpico' ? [0,h] : [0,-h,h])) {
-            const cx = THREE.MathUtils.clamp(px+dx+(dx===0 ? nudge : 0),w/2+8,width-w/2-8);
-            const cy = THREE.MathUtils.clamp(py+dy+(dx!==0 ? nudge : 0),h/2+8,height-h/2-8);
-            const edgeX = THREE.MathUtils.clamp(px,cx-w/2,cx+w/2);
-            const edgeY = THREE.MathUtils.clamp(py,cy-h/2,cy+h/2);
-            const length = Math.hypot(edgeX-px,edgeY-py);
-            if (length > Math.min(width,height)*.48) continue;
-            const overlap = occupied.reduce((sum,r) => sum + Math.max(0,Math.min(cx+w/2,r.right)-Math.max(cx-w/2,r.left)+8)*Math.max(0,Math.min(cy+h/2,r.bottom)-Math.max(cy-h/2,r.top)+8),0);
-            const pinOverlap = callouts.reduce((sum,other) => {
-              const q = district.localToWorld(other.anchor.clone()).project(camera);
-              const x = (q.x+1)*width/2, y = (1-q.y)*height/2;
-              return sum + (Math.abs(cx-x)<w/2+height*.018 && Math.abs(cy-y)<h/2+height*.018 ? 1 : 0);
-            },0);
-            const padding = height*.023;
-            const hits = samples => samples.reduce((sum,q) => sum + (Math.abs(cx-q.x)<w/2+padding && Math.abs(cy-q.y)<h/2+padding ? 1 : 0),0);
-            // Close neighbours 1 and 2 use opposite screen sides.
-            const wrongSide = stop.number === '1' ? Math.max(0, cy-py+h) : stop.number === '2' ? Math.max(0,py-cy+h) : 0;
-            candidates.push({cx,cy,edgeX,edgeY,length,score:overlap*10000+(pinOverlap+hits(landmarks)+hits(routeSamples))*width*height+wrongSide*width+length});
-          }
-        }
-      }
-      // A zoomed or rotated anchor can leave no short leader candidate. Keep its label.
-      const fallbackX = THREE.MathUtils.clamp(px, w/2+8, width-w/2-8);
-      const fallbackY = THREE.MathUtils.clamp(py-h/2-gap, h/2+8, height-h/2-8);
-      const fallbackEdgeX = THREE.MathUtils.clamp(px, fallbackX-w/2, fallbackX+w/2);
-      const fallbackEdgeY = THREE.MathUtils.clamp(py, fallbackY-h/2, fallbackY+h/2);
-      const best = candidates.sort((a,b)=>a.score-b.score)[0] ?? {
-        cx: fallbackX, cy: fallbackY, edgeX: fallbackEdgeX, edgeY: fallbackEdgeY,
-        length: Math.hypot(fallbackEdgeX-px, fallbackEdgeY-py)
-      };
-      const {cx,cy,edgeX,edgeY,length} = best;
-      occupied.push({left:cx-w/2,right:cx+w/2,top:cy-h/2,bottom:cy+h/2});
-      sprite.position.set(cx/width*2-1,1-cy/height*2,projected.z).unproject(camera);
-      // Keep interactive card edges fixed to their short leaders, including during pauses.
-      const pulse = 1;
-      sprite.scale.set(w/width*viewWidth*pulse,h/height*viewHeight*pulse,1);
-      sprite.material.color.set(stop.number === pausedStop ? '#ffe0a0' : '#ffffff');
-      sprite.layers.set(0);
-      if (interactive && stop.number === pausedStop) sprite.layers.enable(1);
-      const edge = new THREE.Vector3(edgeX/width*2-1,1-edgeY/height*2,projected.z).unproject(camera);
-      line.geometry.setFromPoints([worldAnchor,edge]);
-      projectedStops.push({number:stop.number,name:stop.name,pin:[px,py],label:[cx,cy],leaderFraction:length/Math.min(width,height)});
+    // Lean heads along the camera's horizontal axis, with stems to the true stop.
+    const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0);
+    const localRight=right.clone().applyQuaternion(district.quaternion.clone().invert());
+    localRight.y=0;
+    // Preserve a horizontal screen displacement while keeping the lean on the ground axes.
+    const screenRight=localRight.clone().applyQuaternion(district.quaternion);
+    localRight.divideScalar(Math.max(.01,screenRight.dot(right)));
+    callouts.forEach(({stop,anchor})=>{
+      anchor.set(stop.position[0],stop.pinHeight,stop.position[1]);
+      if(stop.number==='1' || stop.number==='2') anchor.addScaledVector(localRight,(stop.number==='1'?-1:1)*22/width*viewWidth);
     });
+    pinParts.forEach(({object,origin,offset,scale})=>{
+      const entry=callouts.find(c=>c.stop.position[0]===origin.x && c.stop.position[1]===origin.z);
+      object.position.copy(entry.anchor).add(offset); object.scale.copy(scale);
+    });
+    callouts.forEach(entry=>{
+      if (!entry.stem) {
+        entry.stem=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:'#e2761d',depthTest:false}));
+        entry.stem.renderOrder=110; district.add(entry.stem);
+      }
+      entry.stem.geometry.setFromPoints([new THREE.Vector3(entry.stop.position[0],.2,entry.stop.position[1]),entry.anchor]);
+    });
+    const screenPins=callouts.map(c=>projectLocal(c.anchor));
+    const routeSamples=points.map(([x,z])=>projectLocal(new THREE.Vector3(x,.55,z)));
+    callouts.forEach(({stop,sprite,ratio,line,anchor,element,domLine},index)=>{
+      const {x:px,y:py}=screenPins[index];
+      const worldAnchor=district.localToWorld(anchor.clone()), projected=worldAnchor.clone().project(camera);
+      let w,h;
+      const margin=interactive?8:height*.015, gap=interactive?10:height*.008;
+      if(interactive){
+        element.classList.toggle('active',stop.number===pausedStop);
+        element.style.maxWidth=`${Math.max(40,width-2*margin)/1.12}px`;
+        w=element.offsetWidth; h=element.offsetHeight;
+      } else { h=height*.065; w=h*ratio; if(w>width*.48){w=width*.48;h=w/ratio;} }
+      // Reserve the active scale envelope, so pulsing pills also remain inside.
+      const envelope=interactive?1.12:1, ew=w*envelope, eh=h*envelope;
+      const forced=stop.number==='1'?-1:stop.number==='2'?1:null;
+      const side=forced ?? (px+gap+ew>width-margin?-1:1);
+      const cx=THREE.MathUtils.clamp(px+side*(gap+ew/2),margin+ew/2,width-margin-ew/2);
+      const candidates=[];
+      for(let step=0;step<Math.ceil(height/(eh+6));step++){
+        for(const sign of (step?[ -1,1 ]:[1])){
+          const cy=THREE.MathUtils.clamp(py+sign*step*(eh+6),margin+eh/2,height-margin-eh/2);
+          const overlap=occupied.reduce((sum,r)=>sum+Math.max(0,Math.min(cx+ew/2,r.right)-Math.max(cx-ew/2,r.left)+4)*Math.max(0,Math.min(cy+eh/2,r.bottom)-Math.max(cy-eh/2,r.top)+4),0);
+          candidates.push({cy,score:overlap*10000+Math.abs(cy-py)});
+        }
+      }
+      const {cy}=candidates.sort((a,b)=>a.score-b.score)[0];
+      occupied.push({left:cx-ew/2,right:cx+ew/2,top:cy-eh/2,bottom:cy+eh/2});
+      const edgeX=THREE.MathUtils.clamp(px,cx-w/2,cx+w/2),edgeY=THREE.MathUtils.clamp(py,cy-h/2,cy+h/2);
+      if(interactive){
+        element.style.left=`${cx-w/2}px`; element.style.top=`${cy-h/2}px`;
+        domLine.setAttribute('x1',px);domLine.setAttribute('y1',py);domLine.setAttribute('x2',edgeX);domLine.setAttribute('y2',edgeY);
+      } else {
+        sprite.position.set(cx/width*2-1,1-cy/height*2,projected.z).unproject(camera);
+        sprite.scale.set(w/width*viewWidth,h/height*viewHeight,1);
+        line.geometry.setFromPoints([worldAnchor,new THREE.Vector3(edgeX/width*2-1,1-edgeY/height*2,projected.z).unproject(camera)]);
+      }
+      projectedStops.push({number:stop.number,name:stop.name,pin:[px,py],label:[cx,cy],leaderFraction:Math.hypot(edgeX-px,edgeY-py)/Math.min(width,height)});
+    });
+    scene.updateMatrixWorld(true);
     if (mapOnly) {
       // Fit the route, complete pin silhouettes and actual laid-out cards together.
       const padding = height*.035;
@@ -483,9 +489,29 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     composer.render();
   }
   function render(time = 0) { draw(time); }
+  const debug = () => {
+    const rect=container.getBoundingClientRect();
+    const project=point=>{const q=point.project(camera);return {x:(q.x+1)*width/2,y:(1-q.y)*height/2};};
+    return {pins:callouts.map(c=>({n:c.stop.number,...project(district.localToWorld(c.anchor.clone()))})),
+      labels:callouts.map(c=>{const r=c.element?.getBoundingClientRect();return {n:c.stop.number,left:r?.left-rect.left,top:r?.top-rect.top,right:r?.right-rect.left,bottom:r?.bottom-rect.top};}),
+      container:{w:width,h:height},figuresOnScreen:students.map(({figure})=>project(figure.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0)))).filter(p=>p.x>=0&&p.x<=width&&p.y>=0&&p.y<=height)};
+  };
+  if(interactive) window.__map3dDebug=debug;
+  const resizeObserver=interactive?new ResizeObserver(()=>{
+    const w=container.clientWidth,h=container.clientHeight;
+    if(!w||!h||(w===width&&h===height))return;
+    width=w;height=h;
+    camera.left=-span*(w/h)/2;camera.right=span*(w/h)/2;
+    renderer.setSize(w,h);bloomComposer.setSize(w,h);composer.setSize(w,h);
+    fitCamera(); controls.target.copy(fittedTarget);controls.minZoom=camera.zoom*.75;controls.maxZoom=camera.zoom*2;
+    draw(lastWalkFrame??0);
+  }):null;
+  resizeObserver?.observe(container);
   render();
   return { renderer, render, dispose() {
     disposed = true;
+    resizeObserver?.disconnect(); labelOverlay?.remove(); labelStyle?.remove();
+    if(interactive){container.style.position=originalPosition;if(window.__map3dDebug===debug)delete window.__map3dDebug;}
     renderer.domElement.removeEventListener('pointerdown',beginTap);
     renderer.domElement.removeEventListener('pointerup',endTap);
     controls?.domElement.removeEventListener('wheel', passWheel, true);
