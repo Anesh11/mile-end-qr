@@ -7,12 +7,24 @@ import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/exam
 import { ShaderPass } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/postprocessing/ShaderPass.js';
 import { OutputPass } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/postprocessing/OutputPass.js';
 
+// Route order and district-local landmark positions are shared by every representation.
+export const STOPS = [
+  { id: 'metro', number: 'M', name: 'DÉPART · MÉTRO LAURIER', position: [7, -6], pinHeight: 1.5 },
+  { id: 'fairmount', number: '1', name: 'FAIRMOUNT BAGEL', position: [-1, -4.9], pinHeight: 1.5, description: 'la célèbre boulangerie de bagels' },
+  { id: 'drogheria', number: '2', name: 'DROGHERIA FINE', position: [-2.5, -4.9], pinHeight: 1.5, description: "l'épicerie italienne du quartier" },
+  { id: 'olimpico', number: '3', name: 'CAFÉ OLIMPICO', position: [-5, 1], pinHeight: 1.7, description: 'le café célèbre depuis 1970' },
+  { id: 'church', number: '4', name: 'ÉGLISE SAINT-MICHEL-ARCHANGE', position: [-7.1, 1.4], pinHeight: 3.6, description: 'la belle église du quartier' },
+  { id: 'rialto', number: '5', name: 'THÉÂTRE RIALTO', position: [4.8, 5.3], pinHeight: 2.4, description: 'le vieux cinéma des années 1920,', extra: "point d'arrivée" }
+];
+
 export function mountMap3D(container, { interactive = true, width = container.clientWidth || 640, height = 440, pixelRatio = 1, preserveDrawingBuffer = false } = {}) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer });
   renderer.setPixelRatio(interactive ? Math.min(pixelRatio, 2) : 1);
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.setSize(width, height);
   renderer.setClearColor('#fdf3e3');
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1;
   renderer.domElement.setAttribute('role', 'img');
   renderer.domElement.setAttribute('aria-label', 'Circuit schématique du Mile End : station Laurier, Fairmount Bagel, Drogheria Fine, Café Olimpico, église Saint-Michel-Archange et Théâtre Rialto.');
   container.append(renderer.domElement);
@@ -25,10 +37,22 @@ export function mountMap3D(container, { interactive = true, width = container.cl
   sunlight.castShadow = true; sunlight.shadow.mapSize.setScalar(interactive ? 1024 : 4096);
   Object.assign(sunlight.shadow.camera, { left: -18, right: 18, top: 18, bottom: -18, near: .1, far: 70 });
   sunlight.shadow.bias = -.0005; sunlight.shadow.normalBias = .03;
+  // Only route objects are on layer 1; cream surfaces, pins and text never enter bloom.
+  const bloomComposer = new EffectComposer(renderer);
+  bloomComposer.renderToScreen = false;
+  const bloomScene = new RenderPass(scene, camera);
+  bloomScene.clearColor = new THREE.Color(0x000000);
+  bloomScene.clearAlpha = 0;
+  bloomComposer.addPass(bloomScene);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(width, height), .65, .4, .9);
+  bloomComposer.addPass(bloom);
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(width, height), .85, .8, 1.5);
-  composer.addPass(bloom);
+  composer.addPass(new ShaderPass({
+    uniforms: { tDiffuse: { value: null }, bloomTexture: { value: bloomComposer.renderTarget2.texture } },
+    vertexShader: `varying vec2 vUv; void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+    fragmentShader: `uniform sampler2D tDiffuse; uniform sampler2D bloomTexture; varying vec2 vUv; void main(){vec4 base=texture2D(tDiffuse,vUv);gl_FragColor=vec4(base.rgb+texture2D(bloomTexture,vUv).rgb,base.a);}`
+  }));
   const finish = new ShaderPass({ uniforms: { tDiffuse: { value: null }, texel: { value: new THREE.Vector2(1 / width, 1 / height) } }, vertexShader: `varying vec2 vUv; void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`, fragmentShader: `uniform sampler2D tDiffuse; uniform vec2 texel; varying vec2 vUv; void main(){float edge=smoothstep(.24,.5,abs(vUv.y-.5));vec4 c=texture2D(tDiffuse,vUv)*.4;for(int i=1;i<=3;i++){vec2 d=texel*float(i)*edge*2.;c+=(texture2D(tDiffuse,vUv+d)+texture2D(tDiffuse,vUv-d))*.1;}float vignette=1.-.18*smoothstep(.25,.7,length(vUv-.5));gl_FragColor=vec4(c.rgb*vignette,c.a);}` });
   composer.addPass(finish); composer.addPass(new OutputPass());
   if (interactive) bloom.setSize(width * renderer.getPixelRatio() / 2, height * renderer.getPixelRatio() / 2);
@@ -68,40 +92,53 @@ export function mountMap3D(container, { interactive = true, width = container.cl
   for (let x = -9.7; x < 10; x += .9) {
     for (let z = -6; z < 6.5; z += 1.05) {
       if (crosses.some(v => Math.abs(x - v) < .8) || avenues.some(v => Math.abs(z - v) < .85)) continue;
-      // Reserve space for the church and the theatre.
-      if ((Math.abs(x + 8) < 1.8 && Math.abs(z - 1.4) < 1.6) || (Math.abs(x - 4) < 1.6 && Math.abs(z - 5.4) < 1.3)) continue;
+      if (STOPS.some(({position: [sx, sz]}) => Math.abs(x - sx) < 1.5 && Math.abs(z - sz) < 1.4)) continue;
       const h = .3 + random() * 1.1;
       box(.65, h, .72, bricks[Math.floor(random() * bricks.length)], x, h / 2, z);
       box(.69, .09, .76, mat('#efddc3'), x, h + .045, z);
     }
   }
-  // Byzantine church: drum, hemisphere and twin towers.
-  box(2.1, 1, 1.6, stone, -7.1, .5, 1.4);
-  mesh(new THREE.CylinderGeometry(.8, .8, .6, 24), stone, -7.1, 1.3, 1.4);
-  mesh(new THREE.SphereGeometry(.83, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), dome, -7.1, 1.6, 1.4);
-  [-8, -6.2].forEach(x => {
-    box(.4, 1.8, .4, stone, x, .9, .7);
-    mesh(new THREE.ConeGeometry(.32, .5, 8), dome, x, 2.05, .7);
+  // Build landmark geometry relative to its stop, never a second world position.
+  STOPS.forEach(stop => {
+    const first = district.children.length;
+    if (stop.id === 'church') {
+      box(2.1, 1, 1.6, stone, 0, .5, 0);
+      mesh(new THREE.CylinderGeometry(.8, .8, .6, 24), stone, 0, 1.3, 0);
+      mesh(new THREE.SphereGeometry(.83, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), dome, 0, 1.6, 0);
+      [-.9, .9].forEach(x => {
+        box(.4, 1.8, .4, stone, x, .9, -.7);
+        mesh(new THREE.ConeGeometry(.32, .5, 8), dome, x, 2.05, -.7);
+      });
+      box(.08, .7, .08, stone, 0, 2.75, 0); box(.42, .08, .08, stone, 0, 2.85, 0);
+    } else if (stop.id === 'rialto') {
+      box(1.8, 1.7, 1.2, stone, 0, .85, 0);
+      box(2, .24, .65, new THREE.MeshStandardMaterial({color:'#ffcf7c',emissive:'#ff982c',emissiveIntensity:2}), 0, .95, -.75);
+      label('RIALTO', 0, 1.35, -.8, .37, '#f0625a', true);
+    } else if (stop.id === 'metro') {
+      box(.28, 1.3, .28, orange, 0, .65, 0);
+    } else {
+      box(1.2, .7, .7, stone, 0, .35, 0);
+      if (stop.id === 'olimpico') box(1.5, .12, .6, mat('#28614f'), 0, .7, -.5);
+    }
+    district.children.slice(first).forEach(object => {
+      object.position.x += stop.position[0]; object.position.z += stop.position[1];
+    });
   });
-  box(.08, .7, .08, stone, -7.1, 2.75, 1.4); box(.42, .08, .08, stone, -7.1, 2.85, 1.4);
-  box(1.8, 1.7, 1.2, stone, 4.8, .85, 5.3);
-  box(2, .24, .65, new THREE.MeshStandardMaterial({color:'#ffcf7c',emissive:'#ff982c',emissiveIntensity:2}), 4.8, .95, 4.55);
-  label('RIALTO', 4.8, 1.35, 4.5, .37, '#f0625a', true);
-  const points = [[7,-6],[7,-4],[-1,-4],[-2,-4],[-5,-4],[-5,0],[-8,0],[-8,4],[4,4]];
+  // Each leg reaches the next landmark, with an orthogonal bend derived from its endpoints.
+  const points = [STOPS[0].position];
+  STOPS.slice(1).forEach((stop, i) => {
+    const previous = STOPS[i].position;
+    if (previous[0] !== stop.position[0] && previous[1] !== stop.position[1]) points.push([stop.position[0], previous[1]]);
+    points.push(stop.position);
+  });
   const curve = new THREE.CurvePath();
   points.slice(1).forEach(([x,z], i) => curve.add(new THREE.LineCurve3(new THREE.Vector3(points[i][0], .18, points[i][1]), new THREE.Vector3(x, .18, z))));
-  const purple = new THREE.MeshStandardMaterial({ color: '#5b2cff', emissive: '#5b2cff', emissiveIntensity: 3 });
-  mesh(new THREE.TubeGeometry(curve, 300, .075, 8, false), purple, 0, 0, 0);
-  mesh(new THREE.TubeGeometry(curve, 300, .19, 8, false), new THREE.MeshBasicMaterial({ color: '#5b2cff', transparent: true, opacity: .17, blending: THREE.AdditiveBlending, depthWrite: false }), 0, 0, 0);
-  const pulse = mesh(new THREE.SphereGeometry(.15, 12, 8), new THREE.MeshBasicMaterial({ color: '#fff1ff' }), 0, 0, 0);
-  const stops = [
-    [-1,-4,'1','FAIRMOUNT BAGEL',2.9], [-2,-4,'2','DROGHERIA FINE',1.8],
-    [-5,0,'3','CAFÉ OLIMPICO',2.5], [-8,0,'4','ÉGLISE SAINT-MICHEL-ARCHANGE',3.5],
-    [4,4,'5','THÉÂTRE RIALTO',2.9]
-  ];
-  // Camera-space callouts keep close neighbours on opposite sides and every card readable.
+  const purple = new THREE.MeshStandardMaterial({ color: '#5b2cff', emissive: '#5b2cff', emissiveIntensity: 5 });
+  mesh(new THREE.TubeGeometry(curve, 300, .10, 8, false), purple, 0, 0, 0).layers.enable(1);
+  mesh(new THREE.TubeGeometry(curve, 300, .28, 8, false), new THREE.MeshBasicMaterial({ color: '#5b2cff', transparent: true, opacity: .3, blending: THREE.AdditiveBlending, depthWrite: false }), 0, 0, 0).layers.enable(1);
+  const pulse = mesh(new THREE.SphereGeometry(.15, 12, 8), new THREE.MeshBasicMaterial({ color: new THREE.Color('#fff1ff').multiplyScalar(3) }), 0, 0, 0);
+  pulse.layers.enable(1);
   const callouts = [];
-  const slots = [[.78,.78],[.27,.90],[.19,.62],[.32,.20],[.76,.29],[.80,.94]];
   function card(text, number) {
     const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d');
     ctx.font = 'bold 64px "Bebas Neue", Impact, sans-serif';
@@ -115,20 +152,17 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map:texture,depthTest:false,depthWrite:false})); sprite.renderOrder=10; scene.add(sprite);
     return {sprite, ratio:canvas.width/canvas.height};
   }
-  function callout(x,z,text,number,slot) {
-    const {sprite,ratio}=card(text,number);
-    const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:'#e2761d',depthTest:false,transparent:true,opacity:.8})); line.renderOrder=9; scene.add(line);
-    callouts.push({sprite,ratio,line,anchor:new THREE.Vector3(x,.5,z),slot});
-  }
-  stops.forEach(([x,z,n,name,h],i) => {
+  STOPS.forEach(stop => {
+    const [x, z] = stop.position, h = stop.pinHeight;
     const pin = mesh(new THREE.ConeGeometry(.22,.9,12),orange,x,h-.6,z); pin.rotation.z=Math.PI;
-    mesh(new THREE.SphereGeometry(.32,16,12),orange,x,h,z); label(n,x,h+.02,z,.43,'#ffffff');
-    callout(x,z,name,n,slots[i]);
+    mesh(new THREE.SphereGeometry(.32,16,12),orange,x,h,z);
+    label(stop.number,x,h+.02,z,stop.id === 'metro' ? .65 : .43,stop.id === 'metro' ? '#e2761d' : '#ffffff',stop.id === 'metro');
+    // Numbers appear once on the map, on their own pins.
+    const {sprite,ratio} = card(stop.name, null);
+    const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:'#e2761d',depthTest:false,transparent:true,opacity:.8}));
+    line.renderOrder=9; scene.add(line);
+    callouts.push({stop,sprite,ratio,line,anchor:new THREE.Vector3(x,h,z)});
   });
-  box(.28,1.3,.28,orange,7,.65,-6); label('M',7,1.5,-6,.65,'#e2761d',true);
-  callout(7,-6,'DÉPART · MÉTRO LAURIER',null,slots[5]);
-  box(1.2,.7,.7,stone,-1,.35,-4.9); label('FAIRMOUNT BAGEL',-1,.9,-4.9,.30,'#1b2a4a',true);
-  box(1.4,.8,.8,stone,-5,.4,1); box(1.5,.12,.6,mat('#28614f'),-5,.7,.5); label('OLIMPICO',-5,1,1,.32,'#1b2a4a',true);
   const foliage=mat('#829767'), trunk=mat('#927052');
   for(let i=0;i<24;i++){const x=-9+(i%12)*1.65,z=i<12 ? -3.3 : 4.8;if(crosses.some(v=>Math.abs(x-v)<.6))continue;mesh(new THREE.CylinderGeometry(.06,.09,.5,6),trunk,x,.25,z);mesh(new THREE.IcosahedronGeometry(.34,1),foliage,x,.65,z);}
   // Transparent radial footprints give buildings soft contact shadows.
@@ -154,15 +188,58 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     if (disposed) return;
     pulse.position.copy(curve.getPoint((time * .00008) % 1));
     scene.updateMatrixWorld(true); camera.updateMatrixWorld(true);
-    const cardHeight=(camera.top-camera.bottom)/camera.zoom*.052;
-    callouts.forEach(({sprite,ratio,line,anchor,slot})=>{
-      const h=Math.min(cardHeight, (camera.right-camera.left)/camera.zoom*.82/ratio);
-      const halfWidth=h*ratio/((camera.right-camera.left)/camera.zoom)/2;
-      const screenX=THREE.MathUtils.clamp(slot[0], halfWidth+.025, 1-halfWidth-.025);
-      sprite.position.set(screenX*2-1,slot[1]*2-1,0).unproject(camera);
-      sprite.scale.set(h*ratio,h,1);
-      line.geometry.setFromPoints([district.localToWorld(anchor.clone()),sprite.position]);
+    const viewWidth = (camera.right-camera.left)/camera.zoom;
+    const viewHeight = (camera.top-camera.bottom)/camera.zoom;
+    const occupied = [], projectedStops = [];
+    callouts.forEach(({stop,sprite,ratio,line,anchor}) => {
+      const worldAnchor = district.localToWorld(anchor.clone());
+      const projected = worldAnchor.clone().project(camera);
+      const px = (projected.x+1)*width/2, py = (1-projected.y)*height/2;
+      const h = Math.min(height*.035, width*.29/ratio), w = h*ratio;
+      const gap = Math.min(width,height)*.025;
+      // Try nearby card edges; all candidates keep the leader within 12% of the frame.
+      const candidates = [];
+      for (const distance of [gap, gap*2, gap*3]) {
+        for (const [dx,dy] of [[0,-h/2-distance],[0,h/2+distance],[-w/2-distance,0],[w/2+distance,0]]) {
+          for (const nudge of [0,-h,h]) {
+            const cx = THREE.MathUtils.clamp(px+dx+(dx===0 ? nudge : 0),w/2+8,width-w/2-8);
+            const cy = THREE.MathUtils.clamp(py+dy+(dx!==0 ? nudge : 0),h/2+8,height-h/2-8);
+            const edgeX = THREE.MathUtils.clamp(px,cx-w/2,cx+w/2);
+            const edgeY = THREE.MathUtils.clamp(py,cy-h/2,cy+h/2);
+            const length = Math.hypot(edgeX-px,edgeY-py);
+            if (length > Math.min(width,height)*.12) continue;
+            const overlap = occupied.reduce((sum,r) => sum + Math.max(0,Math.min(cx+w/2,r.right)-Math.max(cx-w/2,r.left)+8)*Math.max(0,Math.min(cy+h/2,r.bottom)-Math.max(cy-h/2,r.top)+8),0);
+            const pinOverlap = callouts.reduce((sum,other) => {
+              const q = district.localToWorld(other.anchor.clone()).project(camera);
+              const x = (q.x+1)*width/2, y = (1-q.y)*height/2;
+              return sum + (Math.abs(cx-x)<w/2+height*.018 && Math.abs(cy-y)<h/2+height*.018 ? 1 : 0);
+            },0);
+            candidates.push({cx,cy,edgeX,edgeY,length,score:overlap*100+pinOverlap*width*height+length});
+          }
+        }
+      }
+      // A zoomed or rotated anchor can leave no short leader candidate. Keep its label.
+      const fallbackX = THREE.MathUtils.clamp(px, w/2+8, width-w/2-8);
+      const fallbackY = THREE.MathUtils.clamp(py-h/2-gap, h/2+8, height-h/2-8);
+      const fallbackEdgeX = THREE.MathUtils.clamp(px, fallbackX-w/2, fallbackX+w/2);
+      const fallbackEdgeY = THREE.MathUtils.clamp(py, fallbackY-h/2, fallbackY+h/2);
+      const best = candidates.sort((a,b)=>a.score-b.score)[0] ?? {
+        cx: fallbackX, cy: fallbackY, edgeX: fallbackEdgeX, edgeY: fallbackEdgeY,
+        length: Math.hypot(fallbackEdgeX-px, fallbackEdgeY-py)
+      };
+      const {cx,cy,edgeX,edgeY,length} = best;
+      occupied.push({left:cx-w/2,right:cx+w/2,top:cy-h/2,bottom:cy+h/2});
+      sprite.position.set(cx/width*2-1,1-cy/height*2,projected.z).unproject(camera);
+      sprite.scale.set(w/width*viewWidth,h/height*viewHeight,1);
+      const edge = new THREE.Vector3(edgeX/width*2-1,1-edgeY/height*2,projected.z).unproject(camera);
+      line.geometry.setFromPoints([worldAnchor,edge]);
+      projectedStops.push({number:stop.number,name:stop.name,pin:[px,py],label:[cx,cy],leaderFraction:length/Math.min(width,height)});
     });
+    renderer.domElement.projectedStops = projectedStops;
+    const cameraLayers = camera.layers.mask;
+    camera.layers.set(1);
+    try { bloomComposer.render(); }
+    finally { camera.layers.mask = cameraLayers; }
     composer.render();
   }
   function render(time = 0) { draw(time); }
@@ -177,7 +254,9 @@ export function mountMap3D(container, { interactive = true, width = container.cl
       if (object.material) for (const material of [object.material].flat()) { materials.add(material); if (material.map) textures.add(material.map); }
     });
     geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose()); textures.forEach(t => t.dispose());
-    composer.passes.forEach(pass => pass.dispose?.()); composer.dispose();
+    for (const pipeline of [bloomComposer, composer]) {
+      pipeline.passes.forEach(pass => pass.dispose?.()); pipeline.dispose();
+    }
     renderer.dispose(); renderer.domElement.remove();
   } };
 }
