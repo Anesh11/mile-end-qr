@@ -40,5 +40,33 @@
   "author": "Archives de la Ville de Montréal. CA M001 VM094-Y-1-17-D0118 (1er avril 1936)",
   "license": "CC BY-NC-SA 4.0",
   "page": "https://archivesdemontreal.com/nous-joindre/"
+ },
+ "stviateur": {
+  "file": "File:St-Viateur Bagel - 158 Saint-Viateur Ouest - 01.jpg",
+  "author": "Jeangagnon",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:St-Viateur_Bagel_-_158_Saint-Viateur_Ouest_-_01.jpg",
+  "note": ""
+ },
+ "murales": {
+  "file": "File:20181013 - 05 - Montreal (Mile End).jpg",
+  "author": "Andre Carrotflower",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:20181013_-_05_-_Montreal_(Mile_End).jpg",
+  "note": ""
+ },
+ "alfred": {
+  "file": "File:20181013 - 01 - Montreal (Mile End).jpg",
+  "author": "Andre Carrotflower",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:20181013_-_01_-_Montreal_(Mile_End).jpg",
+  "note": "photo d'illustration du Mile End"
+ },
+ "mimicoco": {
+  "file": "File:Avenue Bernard.jpg",
+  "author": "GuyofMshire",
+  "license": "CC BY 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Avenue_Bernard.jpg",
+  "note": "photo d'illustration du Mile End"
  }
 }

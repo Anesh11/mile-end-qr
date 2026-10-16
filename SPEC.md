@@ -10,3 +10,12 @@ Structure:
 4. Footer: "Réalisé par Manushi, Preshita, Fariba et Arina" and a "Crédits photos" line saying photos from Wikimedia Commons and Archives de la Ville de Montréal under the stated licences.
 Style: warm, clean; accent color #c8102e (Montreal red), cream background #fbf7f2, system font stack, rounded cards with soft shadow, 16px+ body text, buttons at least 48px tall. Add <meta viewport>, <html lang="fr">, a <title>, a meta description, og tags. All images have French alt text, width/height attrs, loading="lazy" except the first.
 Do not create any other files besides index.html. Do not modify img/ or BRIEF.md.
+
+ADDENDUM (also required):
+- Stops 4-5 slider: also auto-animate once when it scrolls into view (IntersectionObserver: range sweeps 100 -> 0 -> 50 over ~2.5s, so "Avant" transforms into "Aujourd'hui"); stop animating as soon as the user touches it. Respect prefers-reduced-motion (no animation).
+- After stop 5 and before the itinerary, add an ending card titled "Il y a encore plus à découvrir dans le Mile End !" with a 2-column grid (1 column under 360px) of 4 mini cards, each with photo + credit caption (from credits.json, add note text if present) + name + "Voir sur la carte" button:
+  * St-Viateur Bagel, img/stviateur.jpg, https://www.google.com/maps/search/?api=1&query=St-Viateur+Bagel+263+Rue+Saint-Viateur+O+Montreal
+  * Café Alfred, img/alfred.jpg, https://www.google.com/maps/search/?api=1&query=Cafe+Alfred+Mile+End+Montreal
+  * Mimi & Coco, img/mimicoco.jpg, https://www.google.com/maps/search/?api=1&query=Mimi+%26+Coco+Mile+End+Montreal
+  * Les murales du Mile End, img/murales.jpg, https://www.google.com/maps/search/?api=1&query=Murales+Mile+End+Montreal
+- Footer credits also mention BAnQ is not used; just say "Wikimedia Commons et Archives de la Ville de Montréal".
