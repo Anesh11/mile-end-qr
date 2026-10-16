@@ -11,7 +11,7 @@ import { OutputPass } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/
 // Route order and district-local landmark positions are shared by every representation.
 export const STOPS = [
   { id: 'metro', number: 'M', name: 'DÉPART · MÉTRO LAURIER', position: [7, -6], pinHeight: 1.5 },
-  { id: 'drogheria', number: '1', name: 'DROGHERIA FINE', position: [-2.5, -4.9], pinHeight: 1.5, description: "l'épicerie italienne du quartier" },
+  { id: 'drogheria', number: '1', name: 'DROGHERIA FINE', position: [-3.6, -4.9], pinHeight: 1.5, description: "l'épicerie italienne du quartier" },
   { id: 'fairmount', number: '2', name: 'FAIRMOUNT BAGEL', position: [-1, -4.9], pinHeight: 1.5, description: 'la célèbre boulangerie de bagels' },
   { id: 'olimpico', number: '3', name: 'CAFÉ OLIMPICO', position: [-5, 1], pinHeight: 1.7, description: 'le café célèbre depuis 1970' },
   { id: 'church', number: '4', name: 'ÉGLISE SAINT-MICHEL-ARCHANGE', position: [-7.1, 1.4], pinHeight: 3.6, description: 'la belle église du quartier' },
@@ -155,7 +155,7 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     const core = new THREE.Mesh(chevronGeometry(.48,.46,.13),overlay('#ffffff'));
     outline.material.side = core.material.side = THREE.DoubleSide;
     outline.renderOrder = 102; core.renderOrder = 103;
-    arrow.add(outline,core); arrow.scale.setScalar(2); district.add(arrow);
+    arrow.add(outline,core); arrow.scale.setScalar(interactive?2:2.7); district.add(arrow);
     return arrow;
   });
   const callouts = [];
@@ -240,11 +240,13 @@ export function mountMap3D(container, { interactive = true, width = container.cl
   const students = [];
   const journey = [];
   let distance = 0, seconds = 0;
+  const TOTAL_LEN = STOPS.slice(1).reduce((a,st,i)=>a+Math.abs(st.position[0]-STOPS[i].position[0])+Math.abs(st.position[1]-STOPS[i].position[1]),0);
+  const SPEED = TOTAL_LEN/(15-1.5*(STOPS.length-1)); // loop ≈ 15 s incl. 1.5 s pauses
   STOPS.slice(1).forEach((stop,i) => {
     const from = STOPS[i].position, to = stop.position;
     const length = Math.abs(to[0]-from[0])+Math.abs(to[1]-from[1]);
-    journey.push({start:seconds,end:seconds+length/1.35,from:distance,to:distance+length,stop});
-    seconds += length/1.35;
+    journey.push({start:seconds,end:seconds+length/SPEED,from:distance,to:distance+length,stop});
+    seconds += length/SPEED;
     journey.push({start:seconds,end:seconds+1.5,from:distance+length,to:distance+length,stop});
     seconds += 1.5; distance += length;
   });
@@ -429,7 +431,7 @@ export function mountMap3D(container, { interactive = true, width = container.cl
       const {x:px,y:py}=screenPins[index];
       const worldAnchor=district.localToWorld(anchor.clone()), projected=worldAnchor.clone().project(camera);
       let w,h;
-      const margin=interactive?8:height*.015, gap=interactive?10:height*.008;
+      const margin=interactive?8:height*.015, gap=interactive?10:height*.05;
       if(interactive){
         element.classList.toggle('active',stop.number===pausedStop);
         element.style.maxWidth=`${Math.max(40,width-2*margin)/1.12}px`;
@@ -508,9 +510,10 @@ export function mountMap3D(container, { interactive = true, width = container.cl
   }):null;
   resizeObserver?.observe(container);
   render();
+  if(interactive) renderer.setAnimationLoop(t=>draw(t));
   return { renderer, render, dispose() {
     disposed = true;
-    resizeObserver?.disconnect(); labelOverlay?.remove(); labelStyle?.remove();
+    renderer.setAnimationLoop(null); resizeObserver?.disconnect(); labelOverlay?.remove(); labelStyle?.remove();
     if(interactive){container.style.position=originalPosition;if(window.__map3dDebug===debug)delete window.__map3dDebug;}
     renderer.domElement.removeEventListener('pointerdown',beginTap);
     renderer.domElement.removeEventListener('pointerup',endTap);
