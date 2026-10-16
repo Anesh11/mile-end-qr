@@ -18,16 +18,36 @@ try {
   const map = mountMap3D(document.querySelector('#map'), { interactive: false, width: 4961, height: 3508, pixelRatio: 1, preserveDrawingBuffer: true });
   map.render();
   const canvas = document.querySelector('#output'), ctx = canvas.getContext('2d');
-  ctx.drawImage(map.renderer.domElement, 0, 0);
-  ctx.fillStyle = '#fdf3e3'; ctx.fillRect(0, 0, 4961, 550);
-  ctx.font = '220px "Bebas Neue", Impact, sans-serif'; ctx.textAlign = 'center';
-  ctx.fillStyle = '#f0625a'; ctx.fillText('NOTRE CIRCUIT', 2480, 225);
-  ctx.fillStyle = '#e2761d'; ctx.fillText('TOURISTIQUE', 2480, 425);
-  ctx.fillStyle = '#1b2a4a'; ctx.font = '72px "Bebas Neue", Impact, sans-serif';
-  ctx.fillText('5 arrêts incontournables dans le Mile End', 2480, 525);
-  ctx.fillStyle = '#fdf3e3'; ctx.fillRect(0, 3330, 4961, 178);
-  ctx.fillStyle = '#1b2a4a'; ctx.font = '62px "Bebas Neue", Impact, sans-serif';
-  ctx.fillText('Manushi · Preshita · Fariba · Arina', 2480, 3435);
+  ctx.fillStyle = '#fdf3e3'; ctx.fillRect(0, 0, 4961, 3508);
+  // The scene itself is rendered at full export resolution before compositing.
+  ctx.drawImage(map.renderer.domElement, 1280, 600, 3681, 2603);
+  ctx.font = '220px "Bebas Neue", Impact, sans-serif'; ctx.textAlign = 'left';
+  ctx.fillStyle = '#f0625a'; ctx.fillText('NOTRE CIRCUIT', 180, 240);
+  ctx.fillStyle = '#e2761d'; ctx.fillText('TOURISTIQUE', 1580, 240);
+  ctx.fillStyle = '#1b2a4a'; ctx.font = '86px "Bebas Neue", Impact, sans-serif';
+  ctx.fillText('5 arrêts incontournables dans le Mile End', 180, 390);
+  ctx.fillStyle = '#f5dec2'; ctx.beginPath(); ctx.roundRect(180, 475, 1070, 140, 70); ctx.fill();
+  ctx.fillStyle = '#1b2a4a'; ctx.font = '68px "Bebas Neue", Impact, sans-serif';
+  ctx.fillText('≈ 1,2 km · 20 min à pied', 250, 570);
+  const stops = [
+    ['FAIRMOUNT BAGEL', 'la célèbre boulangerie de bagels'],
+    ['DROGHERIA FINE', "l'épicerie italienne du quartier"],
+    ['CAFÉ OLIMPICO', 'le café célèbre depuis 1970'],
+    ['ÉGLISE SAINT-MICHEL-', 'la belle église du quartier', 'ARCHANGE'],
+    ['THÉÂTRE RIALTO', "le vieux cinéma des années 1920,", "point d'arrivée"]
+  ];
+  ctx.strokeStyle = '#e2761d'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(205, 850); ctx.lineTo(205, 2810); ctx.stroke();
+  stops.forEach(([name, description, extra], i) => {
+    const y = 850 + i * 490;
+    ctx.fillStyle = '#e2761d'; ctx.beginPath(); ctx.arc(205, y, 22, 0, Math.PI*2); ctx.fill();
+    ctx.font = '150px "Bebas Neue", Impact, sans-serif'; ctx.fillText(String(i+1), 280, y+45);
+    ctx.fillStyle = '#1b2a4a'; ctx.font = '74px "Bebas Neue", Impact, sans-serif'; ctx.fillText(name, 410, y+12);
+    if(i===3) ctx.fillText(extra, 410, y+95);
+    ctx.font = '38px system-ui, sans-serif'; ctx.fillText(description, 280, y+180);
+    if(i===4) ctx.fillText(extra, 280, y+240);
+  });
+  ctx.fillStyle = '#1b2a4a'; ctx.font = '62px "Bebas Neue", Impact, sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('Manushi · Preshita · Fariba · Arina', 2480, 3400);
   window.__png = canvas.toDataURL('image/png');
   window.__done = true;
   map.dispose();
