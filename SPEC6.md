@@ -1,3 +1,5 @@
+# OVERRIDE (wins over item 1 layout): video stops use the FULL screen (100svh video, centered 9:16, cover on phones) again. Info panel (glass, bottom) shows fully when the card snaps in, then after 3 s fades/collapses (transform+opacity) into a small bottom pill with just the name + a compact Maps button; nothing else over the video. Tapping the video area/card (a transparent tap layer only when collapsed, or the pill) brings the full panel back; it auto-collapses again 3 s after the last interaction (not while the bottom sheet is open). Lire plus bottom sheet and 3D food badge remain inside the full panel. Apply the same auto-collapse to stops 4-5 overlays.
+
 # v4 fixes after phone test (edit index.html only; keep everything else)
 1. Stops 1-3 (video stops: Drogheria Bjj8aSSxzCA, Fairmount -t05RQbvjTo, Olimpico TLtj_e0pcSk) new layout:
    - Video area = top ~65svh of the snap, NOTHING overlaid on it (no gradient, no text, no badges, no credit). Video centered 9:16 within that area, blurred photo backdrop on the sides is ok. Progress bar stays at very top above the video area (it's ok if it sits on the top 6px only).
