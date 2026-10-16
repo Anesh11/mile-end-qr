@@ -7,3 +7,15 @@ Progress bar: shows "Arrêt n/5" and the n-th segment for both (a) and (b) of st
 Keep the 3D depth transitions between ALL snaps (hero, 10 stop snaps, découvrir, route).
 Map tap events (map:stop) no longer needed. Hero CTA scrolls to #arret-1.
 Self-check JS with node. Then stop.
+
+## ADDENDUM — hero 3D model on EVERY info card (centrepiece, large ~min(78vw,340px) square, slow auto-rotate, horizontal drag spins with inertia)
+1 gnocchi carton, 2 sesame bagel, 3 espresso cup + steam (reuse existing procedural builders), 4 NEW Église Saint-Michel-Archange low-poly built in code: cream/beige body, large green-copper Byzantine dome (hemisphere on drum with small windows), two slender towers with small green domes/crosses, arched entrance; 5 NEW Théâtre Rialto façade built in code: Beaux-Arts cream façade with columns/pilasters, arched windows, cornice, marquee canopy with an emissive glowing "RIALTO" sign (canvas texture, warm orange-white glow, slight flicker).
+Lazy-load three.js only when a card is within one screen; render loop only while the card is visible; dispose when far. Canvas: touch-action: pan-y so vertical swipes scroll the page; only horizontal pointer drags rotate (ignore vertical movement; don't preventDefault on vertical). dpr<=2. prefers-reduced-motion: no auto-rotate. Stops 4-5 info cards show the model instead of today's photo (photo can be a faint backdrop).
+
+## ADDENDUM 2 — keep visitors on the page
+Remove ALL Google Maps buttons/links everywhere (info cards, name pills, 'encore plus' mini cards, any route links). Keep address text. No link may open an external site except the small credit links inside the footer credits list (photo/video/music credits): convert every other external <a> (e.g. per-card photo/video credit links, "Voir la vidéo (optionnel)" links) into plain text (credits remain as text). Remove now-unused CSS/JS.
+
+## ADDENDUM 3 — STRONG visible snap transitions (replace existing depth transition)
+Outgoing snap: rotateX up to 25deg (top edge away), scale to 0.85, opacity to 0.35, filter blur up to 6px, as it scrolls out. Incoming: rises from depth translateZ(-300px)/translateY(8%) scale 0.88 -> 1 with slight overshoot (1.03 then 1, via cubic-bezier(.2,1.4,.4,1) when it settles), then its content staggers in: title (0 ms), text (120 ms), 3D/media (240 ms) — fade+translateY(24px)->0, triggered by IntersectionObserver when ≥55% visible (class .in), reset when it leaves.
+Drive the scroll-linked part from scroll position: use CSS scroll-driven animations (animation-timeline: view(); animation-range) where supported (@supports (animation-timeline: view())), else JS fallback: rAF-throttled scroll listener on the scroller computing each nearby section's progress and setting CSS vars --p used in transforms (this is the iOS Safari path). perspective on scroller 1000px. Transform/opacity/filter only.
+Reduced motion: DO NOT disable; use a gentler version (rotateX max 10deg, scale 0.94, no blur, no overshoot, stagger kept but 60 ms).
