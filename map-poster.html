@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carte des 5 arrêts — rendu statique</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap">
+<style>html,body{margin:0;overflow:hidden;background:#ece9e4}#map{width:100vw;height:100vh;background:#ece9e4}#map canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
+</head>
+<body><div id="map"></div>
+<script type="module">
+import { mountMap3D } from './map3d.js';
+window.__ready = false;
+try {
+  await document.fonts.load('bold 26px "Bebas Neue"');
+  await document.fonts.ready;
+  const container = document.querySelector('#map');
+  mountMap3D(container, { interactive: true, width: container.clientWidth, height: container.clientHeight, pixelRatio: devicePixelRatio, posterMode: true });
+  window.__ready = true;
+} catch (error) { window.__error = String(error); console.error(error); }
+</script></body></html>

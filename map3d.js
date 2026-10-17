@@ -18,12 +18,12 @@ export const STOPS = [
   { id: 'rialto', number: '5', name: 'THÉÂTRE RIALTO', position: [4.8, 5.3], pinHeight: 2.4, description: 'le vieux cinéma des années 1920,', extra: "point d'arrivée" }
 ];
 
-export function mountMap3D(container, { interactive = true, width = container.clientWidth || 640, height = 440, pixelRatio = 1, preserveDrawingBuffer = false, mapOnly = false } = {}) {
+export function mountMap3D(container, { interactive = true, width = container.clientWidth || 640, height = 440, pixelRatio = 1, preserveDrawingBuffer = false, mapOnly = false, posterMode = false } = {}) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer });
   renderer.setPixelRatio(interactive ? Math.min(pixelRatio, 2) : 1);
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.setSize(width, height);
-  renderer.setClearColor('#fafaf8');
+  renderer.setClearColor(posterMode ? '#ece9e4' : '#fafaf8');
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1;
   renderer.domElement.setAttribute('role', 'img');
@@ -172,6 +172,11 @@ export function mountMap3D(container, { interactive = true, width = container.cl
       .map3d-label b{display:grid;place-items:center;flex-shrink:0;width:1.45em;height:1.45em;border-radius:50%;background:#e2761d;color:white}
       .map3d-label.active{transform:scale(1.12);box-shadow:0 0 14px 4px #ff8a26aa}
     `;
+    if (posterMode) labelStyle.textContent += `
+      .map3d-labels .map3d-label{font:bold 26px/1.05 "Bebas Neue",Impact,sans-serif;color:white;background:#1b2a4a;padding:6px 12px;box-shadow:0 3px 10px #0006;transition:none;border-radius:24px}
+      .map3d-labels .map3d-label b{width:1.5em;height:1.5em}
+      .map3d-labels .map3d-label span{min-width:0;overflow-wrap:normal}
+    `;
     container.append(labelStyle);
     labelOverlay = document.createElement('div'); labelOverlay.className = 'map3d-labels';
     leaderSvg = document.createElementNS('http://www.w3.org/2000/svg','svg');
@@ -229,7 +234,7 @@ export function mountMap3D(container, { interactive = true, width = container.cl
         if (stop.id !== 'metro') window.dispatchEvent(new CustomEvent('map:stop',{detail:{n:Number(stop.number)}}));
       });
       domLine = document.createElementNS('http://www.w3.org/2000/svg','line');
-      domLine.setAttribute('stroke','#e2761d'); domLine.setAttribute('stroke-width','1.5'); leaderSvg.append(domLine);
+      domLine.setAttribute('stroke',posterMode ? '#1b2a4a' : '#e2761d'); domLine.setAttribute('stroke-width',posterMode ? '3' : '1.5'); leaderSvg.append(domLine);
     } else {
       line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:'#e2761d',depthTest:false,transparent:true,opacity:.8}));
       line.renderOrder=119; scene.add(line);
@@ -250,7 +255,7 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     journey.push({start:seconds,end:seconds+1.5,from:distance+length,to:distance+length,stop});
     seconds += 1.5; distance += length;
   });
-  if (interactive) ['#ff3d7f','#3dd6ff','#ffd23d','#8a5cff'].forEach((shirt,index) => {
+  if (interactive && !posterMode) ['#ff3d7f','#3dd6ff','#ffd23d','#8a5cff'].forEach((shirt,index) => {
     const parts=[], legs=[];
     let count=0;
     function part(geometry,color,x,y,z,leg=0) {
@@ -283,7 +288,7 @@ export function mountMap3D(container, { interactive = true, width = container.cl
   });
   let walkTime=0, lastWalkFrame=null, pausedStop=null;
   function animateStudents(time) {
-    if(!interactive) return;
+    if(!interactive || posterMode) return;
     if(lastWalkFrame!==null) walkTime+=Math.max(0,Math.min((time-lastWalkFrame)/1000,.1));
     lastWalkFrame=time;
     const elapsed=walkTime%seconds;
@@ -365,13 +370,13 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     const center=bounds.getCenter(new THREE.Vector3()), size=bounds.getSize(new THREE.Vector3());
     const offset=new THREE.Vector3(center.x,center.y,0).applyQuaternion(camera.quaternion);
     camera.position.add(offset); fittedTarget.add(offset);
-    const portrait=width<height, padding=portrait ? .14 : .10;
-    const roomX=Math.max(40,width*(1-2*padding)-(portrait?120:60));
-    camera.zoom=Math.min(roomX/width*(camera.right-camera.left)/size.x,(1-2*(portrait ? .12 : .10))*(camera.top-camera.bottom)/size.y);
+    const portrait=width<height, padding=posterMode ? .075 : portrait ? .14 : .10;
+    const roomX=Math.max(40,width*(1-2*padding)-(posterMode?0:portrait?120:60));
+    camera.zoom=Math.min(roomX/width*(camera.right-camera.left)/size.x,(1-2*(posterMode ? .085 : portrait ? .12 : .10))*(camera.top-camera.bottom)/size.y);
     camera.updateProjectionMatrix(); camera.updateMatrixWorld(true);
   }
   fitCamera();
-  const controls = interactive ? new OrbitControls(camera, renderer.domElement) : null;
+  const controls = interactive && !posterMode ? new OrbitControls(camera, renderer.domElement) : null;
   if (controls) {
     controls.target.copy(fittedTarget);
     controls.enablePan = false; controls.enableDamping = false;
@@ -390,7 +395,7 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     if (disposed) return;
     animateStudents(time);
     arrows.forEach((arrow, i) => {
-      const t = (i / arrows.length + (interactive ? time * .000025 : .025)) % 1;
+      const t = (i / arrows.length + (interactive && !posterMode ? time * .000025 : .025)) % 1;
       arrow.position.copy(curve.getPoint(t)); arrow.position.y += .73;
       const tangent = curve.getTangent(t);
       arrow.rotation.y = Math.atan2(tangent.x,tangent.z);
@@ -434,11 +439,11 @@ export function mountMap3D(container, { interactive = true, width = container.cl
       const margin=interactive?8:height*.015, gap=interactive?10:height*.05;
       if(interactive){
         element.classList.toggle('active',stop.number===pausedStop);
-        element.style.maxWidth=`${Math.max(40,width-2*margin)/1.12}px`;
+        element.style.maxWidth=posterMode ? `${stop.id === 'church' ? Math.min(width*.46,width-2*margin) : width-2*margin}px` : `${Math.max(40,width-2*margin)/1.12}px`;
         w=element.offsetWidth; h=element.offsetHeight;
       } else { h=height*.065; w=h*ratio; if(w>width*.48){w=width*.48;h=w/ratio;} }
       // Reserve the active scale envelope, so pulsing pills also remain inside.
-      const envelope=interactive?1.12:1, ew=w*envelope, eh=h*envelope;
+      const envelope=interactive&&!posterMode?1.12:1, ew=w*envelope, eh=h*envelope;
       const forced=stop.number==='1'?-1:stop.number==='2'?1:null;
       const side=forced ?? (px+gap+ew>width-margin?-1:1);
       const cx=THREE.MathUtils.clamp(px+side*(gap+ew/2),margin+ew/2,width-margin-ew/2);
@@ -450,18 +455,35 @@ export function mountMap3D(container, { interactive = true, width = container.cl
           candidates.push({cy,score:overlap*10000+Math.abs(cy-py)});
         }
       }
-      const {cy}=candidates.sort((a,b)=>a.score-b.score)[0];
-      occupied.push({left:cx-ew/2,right:cx+ew/2,top:cy-eh/2,bottom:cy+eh/2});
-      const edgeX=THREE.MathUtils.clamp(px,cx-w/2,cx+w/2),edgeY=THREE.MathUtils.clamp(py,cy-h/2,cy+h/2);
+      let cy=candidates.sort((a,b)=>a.score-b.score)[0].cy, labelX=cx;
+      if (posterMode) {
+        // Search both sides and every free boundary using the actual DOM dimensions.
+        const pinRadius=.65/viewWidth*width+4;
+        const obstacles=occupied.concat(screenPins.map(p=>({left:p.x-pinRadius,right:p.x+pinRadius,top:p.y-pinRadius,bottom:p.y+pinRadius})));
+        const clampX=x=>THREE.MathUtils.clamp(x,margin+ew/2,width-margin-ew/2);
+        const clampY=y=>THREE.MathUtils.clamp(y,margin+eh/2,height-margin-eh/2);
+        const xs=[cx,clampX(px-gap-ew/2),clampX(px+gap+ew/2),margin+ew/2,width-margin-ew/2];
+        const ys=[clampY(py),margin+eh/2,height-margin-eh/2];
+        obstacles.forEach(r=>{xs.push(clampX(r.left-ew/2-6),clampX(r.right+ew/2+6));ys.push(clampY(r.top-eh/2-6),clampY(r.bottom+eh/2+6));});
+        let best=Infinity;
+        for(const x of xs) for(const y of ys){
+          const overlap=obstacles.reduce((sum,r)=>sum+Math.max(0,Math.min(x+ew/2,r.right)-Math.max(x-ew/2,r.left)+4)*Math.max(0,Math.min(y+eh/2,r.bottom)-Math.max(y-eh/2,r.top)+4),0);
+          const score=overlap*1e6+Math.hypot(x-px,y-py);
+          if(score<best){best=score;labelX=x;cy=y;}
+        }
+      }
+      const placedX=labelX;
+      occupied.push({left:placedX-ew/2,right:placedX+ew/2,top:cy-eh/2,bottom:cy+eh/2});
+      const edgeX=THREE.MathUtils.clamp(px,placedX-w/2,placedX+w/2),edgeY=THREE.MathUtils.clamp(py,cy-h/2,cy+h/2);
       if(interactive){
-        element.style.left=`${cx-w/2}px`; element.style.top=`${cy-h/2}px`;
+        element.style.left=`${placedX-w/2}px`; element.style.top=`${cy-h/2}px`;
         domLine.setAttribute('x1',px);domLine.setAttribute('y1',py);domLine.setAttribute('x2',edgeX);domLine.setAttribute('y2',edgeY);
       } else {
-        sprite.position.set(cx/width*2-1,1-cy/height*2,projected.z).unproject(camera);
+        sprite.position.set(placedX/width*2-1,1-cy/height*2,projected.z).unproject(camera);
         sprite.scale.set(w/width*viewWidth,h/height*viewHeight,1);
         line.geometry.setFromPoints([worldAnchor,new THREE.Vector3(edgeX/width*2-1,1-edgeY/height*2,projected.z).unproject(camera)]);
       }
-      projectedStops.push({number:stop.number,name:stop.name,pin:[px,py],label:[cx,cy],leaderFraction:Math.hypot(edgeX-px,edgeY-py)/Math.min(width,height)});
+      projectedStops.push({number:stop.number,name:stop.name,pin:[px,py],label:[placedX,cy],leaderFraction:Math.hypot(edgeX-px,edgeY-py)/Math.min(width,height)});
     });
     scene.updateMatrixWorld(true);
     if (mapOnly) {
@@ -505,12 +527,12 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     width=w;height=h;
     camera.left=-span*(w/h)/2;camera.right=span*(w/h)/2;
     renderer.setSize(w,h);bloomComposer.setSize(w,h);composer.setSize(w,h);
-    fitCamera(); controls.target.copy(fittedTarget);controls.minZoom=camera.zoom*.75;controls.maxZoom=camera.zoom*2;
+    fitCamera(); if(controls){controls.target.copy(fittedTarget);controls.minZoom=camera.zoom*.75;controls.maxZoom=camera.zoom*2;}
     draw(lastWalkFrame??0);
   }):null;
   resizeObserver?.observe(container);
   render();
-  if(interactive) renderer.setAnimationLoop(t=>draw(t));
+  if(interactive && !posterMode) renderer.setAnimationLoop(t=>draw(t));
   return { renderer, render, dispose() {
     disposed = true;
     renderer.setAnimationLoop(null); resizeObserver?.disconnect(); labelOverlay?.remove(); labelStyle?.remove();
