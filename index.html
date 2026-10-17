@@ -129,42 +129,42 @@ canvas{touch-action:pan-y}
   const TIMELINES = {
   "eglise": [
     {
-      "src": "img/eglise-1916.jpg",
+      "src": "img/eglise-1916.jpg?v=2",
       "year": "1916",
       "credit": "Photo : Construction Journal, janvier 1916, Domaine public",
       "alt": "1916 construction",
       "archive": true
     },
     {
-      "src": "img/eglise-1920-banq.jpg",
+      "src": "img/eglise-1920-banq.jpg?v=2",
       "year": "v. 1920",
       "credit": "BAnQ, coll. Michel Bazinet, carte postale, domaine public",
       "alt": "Carte postale de l’église vers 1920",
       "archive": true
     },
     {
-      "src": "img/eglise-1922.jpg",
+      "src": "img/eglise-1922.jpg?v=2",
       "year": "1922",
       "credit": "Photo : Alfred Hunter Ward, Public domain",
       "alt": "1922 intérieur",
       "archive": true
     },
     {
-      "src": "img/eglise-2007.jpg",
+      "src": "img/eglise-2007.jpg?v=2",
       "year": "2007",
       "credit": "Photo : Mourial, CC BY 3.0",
       "alt": "2007",
       "archive": false
     },
     {
-      "src": "img/eglise.jpg",
+      "src": "img/eglise.jpg?v=2",
       "year": "2013",
       "credit": "Photo : Jeangagnon, CC BY-SA 3.0",
       "alt": "2013",
       "archive": false
     },
     {
-      "src": "img/eglise-2025.jpg",
+      "src": "img/eglise-2025.jpg?v=2",
       "year": "Aujourd’hui",
       "credit": "Photo : Jason Zhang, CC BY-SA 4.0",
       "alt": "Aujourd’hui",
@@ -173,28 +173,28 @@ canvas{touch-action:pan-y}
   ],
   "rialto": [
     {
-      "src": "img/rialto-1924-banq.jpg",
+      "src": "img/rialto-1924-banq.jpg?v=2",
       "year": "1924",
       "credit": "BAnQ, Fonds La Presse, P833,S3,D1021, domaine public",
       "alt": "Le Théâtre Rialto peu après son ouverture en 1924",
       "archive": true
     },
     {
-      "src": "img/rialto-1936.jpg",
+      "src": "img/rialto-1936.jpg?v=2",
       "year": "1936",
       "credit": "Photo : Archives de la Ville de Montréal. CA M001 VM094-Y-1-17-D0118 (1er avril 1936), CC BY-NC-SA 4.0",
       "alt": "1936",
       "archive": true
     },
     {
-      "src": "img/rialto-2011.jpg",
+      "src": "img/rialto-2011.jpg?v=2",
       "year": "2011",
       "credit": "Photo : Philippe Du Berger, CC BY 2.0",
       "alt": "2011 détail de la façade",
       "archive": false
     },
     {
-      "src": "img/rialto-2017.jpg",
+      "src": "img/rialto-2017.jpg?v=2",
       "year": "Aujourd’hui",
       "credit": "Photo : Pierre5018, CC BY-SA 4.0",
       "alt": "Aujourd’hui",
@@ -209,7 +209,7 @@ canvas{touch-action:pan-y}
       const image = document.createElement('img');
       image.className = 'timeline-photo' + (photo.archive ? ' archive' : '');
       image.src = photo.src; image.alt = photo.alt || photo.year;
-      image.dataset.label = photo.year; image.loading = 'eager'; image.decoding = 'async'; image.fetchPriority = 'low';
+      image.dataset.label = photo.year; image.loading = 'eager'; image.decoding = 'async'; image.fetchPriority = 'auto';
       media.insertBefore(image, media.querySelector('.era'));
       const caption = document.createElement('div');
       caption.className = 'slide-caption';
