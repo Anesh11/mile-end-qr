@@ -159,6 +159,8 @@ export function mountMap3D(container, { interactive = true, width = container.cl
     return arrow;
   });
   const callouts = [];
+  const avatarImages = [];
+  if (posterMode) window.__labelsReady = false;
   let labelOverlay = null, labelStyle = null, leaderSvg = null;
   const originalPosition = container.style.position;
   if (interactive) {
@@ -173,8 +175,10 @@ export function mountMap3D(container, { interactive = true, width = container.cl
       .map3d-label.active{transform:scale(1.12);box-shadow:0 0 14px 4px #ff8a26aa}
     `;
     if (posterMode) labelStyle.textContent += `
-      .map3d-labels .map3d-label{font:bold 26px/1.05 "Bebas Neue",Impact,sans-serif;color:white;background:#1b2a4a;padding:6px 12px;box-shadow:0 3px 10px #0006;transition:none;border-radius:24px}
-      .map3d-labels .map3d-label b{width:1.5em;height:1.5em}
+      .map3d-labels .map3d-label{font:bold 23px/1.05 "Bebas Neue",Impact,sans-serif;color:white;background:#1b2a4a;padding:4px 12px 4px 4px;box-shadow:0 3px 10px #0006;transition:none;border-radius:24px}
+      .map3d-labels .map3d-avatar{position:relative;flex-shrink:0;width:1.8em;height:1.8em}
+      .map3d-labels .map3d-avatar img,.map3d-labels .map3d-avatar svg{position:static;display:block;box-sizing:border-box;width:100%;height:100%;border:3px solid white;border-radius:50%;background:white;box-shadow:0 2px 6px #0006;object-fit:cover}
+      .map3d-labels .map3d-avatar b{position:absolute;right:0;bottom:0;box-sizing:border-box;width:22px;height:22px;font-size:15px;line-height:1;right:-5px;bottom:-4px;display:grid;place-items:center;border:2px solid white;background:#e2761d;color:white;font-weight:bold}
       .map3d-labels .map3d-label span{min-width:0;overflow-wrap:normal}
     `;
     container.append(labelStyle);
@@ -229,7 +233,18 @@ export function mountMap3D(container, { interactive = true, width = container.cl
       element = document.createElement('button'); element.className = 'map3d-label';
       const badge = document.createElement('b'); badge.textContent = stop.number;
       const name = document.createElement('span'); name.textContent = stop.name;
-      element.append(badge,name); labelOverlay.append(element);
+      if (posterMode) {
+        const avatar = document.createElement('span'); avatar.className = 'map3d-avatar';
+        if (stop.id === 'metro') {
+          avatar.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="8" width="48" height="48" rx="9" fill="#0072bc"/><path d="M18 20h10v15h8V20h10v18L32 50 18 38z" fill="white"/></svg>';
+        } else {
+          const photos = {drogheria:'drogheria-equipe.jpg',fairmount:'fairmount.jpg',olimpico:'olimpico.jpg',church:'eglise-2025.jpg',rialto:'rialto-2017.jpg'};
+          const photo = document.createElement('img'); photo.alt = ''; photo.src = `img/${photos[stop.id]}`;
+          avatarImages.push(photo); avatar.append(photo,badge);
+        }
+        element.append(avatar,name);
+      } else element.append(badge,name);
+      labelOverlay.append(element);
       element.addEventListener('click', () => {
         if (stop.id !== 'metro') window.dispatchEvent(new CustomEvent('map:stop',{detail:{n:Number(stop.number)}}));
       });
@@ -439,7 +454,7 @@ export function mountMap3D(container, { interactive = true, width = container.cl
       const margin=interactive?8:height*.015, gap=interactive?10:height*.05;
       if(interactive){
         element.classList.toggle('active',stop.number===pausedStop);
-        element.style.maxWidth=posterMode ? `${stop.id === 'church' ? Math.min(width*.46,width-2*margin) : width-2*margin}px` : `${Math.max(40,width-2*margin)/1.12}px`;
+        element.style.maxWidth=posterMode ? `${stop.id === 'church' ? Math.min(width*.66,width-2*margin) : width-2*margin}px` : `${Math.max(40,width-2*margin)/1.12}px`;
         w=element.offsetWidth; h=element.offsetHeight;
       } else { h=height*.065; w=h*ratio; if(w>width*.48){w=width*.48;h=w/ratio;} }
       // Reserve the active scale envelope, so pulsing pills also remain inside.
@@ -533,7 +548,12 @@ export function mountMap3D(container, { interactive = true, width = container.cl
   resizeObserver?.observe(container);
   render();
   if(interactive && !posterMode) renderer.setAnimationLoop(t=>draw(t));
-  return { renderer, render, dispose() {
+  const labelsReady = posterMode ? Promise.all(avatarImages.map(img => img.decode())).then(() => {
+    if (disposed) return;
+    render();
+    window.__labelsReady = true;
+  }) : Promise.resolve();
+  return { renderer, render, labelsReady, dispose() {
     disposed = true;
     renderer.setAnimationLoop(null); resizeObserver?.disconnect(); labelOverlay?.remove(); labelStyle?.remove();
     if(interactive){container.style.position=originalPosition;if(window.__map3dDebug===debug)delete window.__map3dDebug;}

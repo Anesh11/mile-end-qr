@@ -16,7 +16,8 @@ try {
   await document.fonts.load('bold 26px "Bebas Neue"');
   await document.fonts.ready;
   const container = document.querySelector('#map');
-  mountMap3D(container, { interactive: true, width: container.clientWidth, height: container.clientHeight, pixelRatio: devicePixelRatio, posterMode: true });
-  window.__ready = true;
+  const map = mountMap3D(container, { interactive: true, width: container.clientWidth, height: container.clientHeight, pixelRatio: devicePixelRatio, posterMode: true });
+  await map.labelsReady;
+  window.__ready = window.__labelsReady === true;
 } catch (error) { window.__error = String(error); console.error(error); }
 </script></body></html>
