@@ -749,22 +749,13 @@ document.addEventListener('visibilitychange',()=>badges.forEach(s=>document.hidd
     section, iframe: null, timer: 0, stillTimer: 0, fallbackTimer: 0, directTimer: 0, playing: false, visible: false, muted: true, paused: false,
     start: Number(section.dataset.start), end: Number(section.dataset.end)
   }));
-  let active = null, mountTimer = 0;
-  let lastScroll = performance.now();
-  function mountAfterIdle() {
-    clearTimeout(mountTimer);
-    mountTimer = setTimeout(() => {
-      const state = states.find(item => item.visible);
-      if (state) mount(state);
-    }, Math.max(0, 400 - (performance.now() - lastScroll)));
+  let mountTimer = 0;
+  function mountAfterIdle() { // mount every snap within one screen immediately (no scroll-idle wait)
+    states.forEach(state => { if (state.near && !document.hidden) mount(state); else if (!state.near) remove(state); });
   }
-  root.addEventListener('scroll', () => {
-    lastScroll = performance.now();
-    mountAfterIdle();
-  }, {passive:true});
   function command(state, func, args = []) {
     if (!state.ytReady) return; // player not confirmed (blocked/failed): don't post into an error page
-    state.iframe?.contentWindow?.postMessage(JSON.stringify({event: 'command', func, args}), 'https://www.youtube.com');
+    try { state.iframe?.contentWindow?.postMessage(JSON.stringify({event: 'command', func, args}), 'https://www.youtube.com'); } catch {}
   }
   function startStills(state) {
     clearInterval(state.stillTimer);
@@ -782,18 +773,41 @@ document.addEventListener('visibilitychange',()=>badges.forEach(s=>document.hidd
     }, 5000);
     startStills(state);
   }
+  function setPlaying(state, on) {
+    state.playing = on && state.visible;
+    state.iframe?.classList.toggle('playing', state.playing);
+    if (state.playing) {
+      clearInterval(state.stillTimer); clearTimeout(state.directTimer);
+      state.playButton.hidden = true; state.hint.hidden = true;
+      state.section.querySelector('.swipe-layer').style.pointerEvents = 'auto';
+    } else startStills(state);
+  }
   function remove(state) {
-    clearInterval(state.stillTimer); clearTimeout(state.fallbackTimer); clearTimeout(state.directTimer);
+    clearInterval(state.stillTimer); clearTimeout(state.fallbackTimer); clearTimeout(state.directTimer); clearInterval(state.handshake);
     state.playing = false; state.playButton.hidden = true; state.hint.hidden = true;
     state.section.querySelector('.swipe-layer').style.pointerEvents = 'auto';
     clearInterval(state.timer); state.timer = 0;
     state.iframe?.remove(); state.iframe = null; state.ytReady = false;
-    if (active === state) active = null;
+  }
+  function startPlayback(state) { // called the moment a snap lands
+    state.paused = false;
+    command(state, 'seekTo', [state.start, true]);
+    command(state, state.muted ? 'mute' : 'unMute');
+    command(state, 'playVideo');
+    clearInterval(state.timer);
+    state.timer = setInterval(() => {
+      if (!state.visible || state.paused || document.hidden) return;
+      command(state, 'seekTo', [state.start, true]); command(state, 'playVideo');
+    }, (state.end-state.start)*1000);
+  }
+  function park(state) { // preloaded but off-screen: stay buffered, paused at the clip start
+    clearInterval(state.timer); state.timer = 0;
+    command(state, 'pauseVideo'); command(state, 'seekTo', [state.start, true]);
+    setPlaying(state, false);
   }
   function mount(state) {
-    if (state.iframe || document.hidden || !state.visible) return;
-    if (active) remove(active);
-    active = state; state.muted = true; state.paused = false;
+    if (state.iframe || document.hidden) return;
+    state.muted = true; state.paused = false;
     const button = state.section.querySelector('.clip-sound');
     button.textContent = '🔊 Son'; button.setAttribute('aria-pressed', 'false');
     const iframe = document.createElement('iframe');
@@ -801,37 +815,33 @@ document.addEventListener('visibilitychange',()=>badges.forEach(s=>document.hidd
     iframe.referrerPolicy = 'strict-origin-when-cross-origin';
     iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
     iframe.title = state.section.getAttribute('aria-label');
-    iframe.loading = 'lazy'; iframe.tabIndex = -1;
+    iframe.tabIndex = -1; // eager load: this is the one-snap-ahead preload
     state.iframe = iframe;
     iframe.addEventListener('load', () => {
       if (state.iframe !== iframe) return;
-      iframe.contentWindow.postMessage(JSON.stringify({event:'listening',id:state.section.id}), 'https://www.youtube.com');
-      command(state, 'addEventListener', ['onStateChange']);
-      command(state, 'playVideo');
-      if (!state.muted) command(state, 'unMute');
+      let tries = 0; clearInterval(state.handshake);
+      const hello = () => { try { iframe.contentWindow.postMessage(JSON.stringify({event:'listening',id:state.section.id}), 'https://www.youtube.com'); } catch {} };
+      hello(); state.handshake = setInterval(() => { if (state.ytReady || ++tries > 40) clearInterval(state.handshake); else hello(); }, 250);
     });
     state.section.querySelector('.youtube-media').append(iframe);
-    state.timer = setInterval(() => {
-      if (!state.visible || state.paused || document.hidden) return;
-      command(state, 'seekTo', [state.start, true]); command(state, 'playVideo');
-    }, (state.end-state.start)*1000);
   }
   window.addEventListener('message', event => {
-    if (event.origin !== 'https://www.youtube.com' || !active || event.source !== active.iframe?.contentWindow) return;
-    active.ytReady = true;
+    if (event.origin !== 'https://www.youtube.com') return;
+    const state = states.find(item => item.iframe && event.source === item.iframe.contentWindow);
+    if (!state) return;
     let data; try { data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data; } catch { return; }
     if (!data) return;
+    if (!state.ytReady) {
+      state.ytReady = true; clearInterval(state.handshake);
+      command(state, 'addEventListener', ['onStateChange']);
+      if (state.visible) startPlayback(state); else park(state);
+    }
     const status = data.event === 'onStateChange' ? data.info : data.info?.playerState;
     if (typeof status === 'number') {
-      active.playing = status === 1;
-      active.iframe.classList.toggle('playing', active.playing);
-      if (active.playing) {
-        clearInterval(active.stillTimer); clearTimeout(active.directTimer);
-        active.playButton.hidden = true; active.hint.hidden = true;
-        active.section.querySelector('.swipe-layer').style.pointerEvents = 'auto';
-      } else { startStills(active); }
+      if (status === 1 && !state.visible) { park(state); return; }
+      setPlaying(state, status === 1);
     }
-    if (status === 0 && !active.paused) { command(active, 'seekTo', [active.start, true]); command(active, 'playVideo'); }
+    if (status === 0 && state.visible && !state.paused) { command(state, 'seekTo', [state.start, true]); command(state, 'playVideo'); }
   });
   function toggle(state) {
     if (!state.iframe) return;
@@ -884,11 +894,15 @@ document.addEventListener('visibilitychange',()=>badges.forEach(s=>document.hidd
       const state = states.find(item => item.section === entry.target);
       const wasVisible = state.visible;
       state.visible = entry.isIntersecting && entry.intersectionRatio >= .6;
-      if (state.visible && !wasVisible) watchFallback(state);
-      if (!state.visible) remove(state);
+      if (state.visible && !wasVisible) { mount(state); watchFallback(state); startPlayback(state); }
+      if (!state.visible && wasVisible) park(state);
     });
-    mountAfterIdle();
   }, {root, threshold:[0,.6]});
+  const nearObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => { states.find(item => item.section === entry.target).near = entry.isIntersecting; });
+    mountAfterIdle();
+  }, {root, rootMargin:'100% 0px'}); // one snap ahead/behind
+  states.forEach(state => nearObserver.observe(state.section));
   states.forEach(state => observer.observe(state.section));
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { clearTimeout(mountTimer); states.forEach(remove); }
